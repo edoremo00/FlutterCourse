@@ -1,0 +1,2 @@
+sizedbox: crea un semplice box. necessita di una larghezza per essere visualizzato
+una larghezza di double.infinity gli permette di espandersi al massimo che può in relazione al widget parent

@@ -1,0 +1,18 @@
+lib--> cartella dove mettiamo file dart
+
+cartelle con nome android ecc--> codice specifico a piattaforma. sono usati sotto il cofano per quando eseguiamo un app. di solito gestiti da flutter
+
+cartella con nome che inizia con . sono file di configurazione
+
+pubspec.yaml ti permette di aggiungere feature ad applicazione flutter
+
+come il codice viene tradotto
+
+1) dart parsa file da in cima fino alla fine
+
+2) tradotto in linguaggio che viene compreso da Android o ios nativo
+
+3) viene creato bundle che viene eseguito su dispositivo
+
+
+runApp funzione presente in ogni applicazione flutter deve essere all'interno del metodo main che viene richiamato quando parte l'applicativo

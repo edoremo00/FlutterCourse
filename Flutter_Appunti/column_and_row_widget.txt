@@ -1,0 +1,20 @@
+colonna--> ci permette di avere più widget uno sotto l'altro 
+ha 2 proprietà chiamate main axis e cross axis
+
+mainaxis----> asse verticale
+rowaxis--> asse orizzontale
+
+occupa tutta l'altezza disponibile di default ma solo la larghezza richiesta dai suoi figli----> comportamento che si può cambiare impostando main axis size a min per farli prendere il minimo spazio possibile
+
+
+riga
+
+main axis--> asse orizzontale
+cross axis--> asse verticale
+
+di default occupa tutta la larghezza disponibile ma solo l'altezza richiesta dai suoi figli-----> comportamento che si può cambiare impostando main axis size a min per farli prendere il minimo spazio possibile
+
+
+
+
+NB: le due proprietà main e cross axis sono usate per gestire il comportamento e l'allineamento dei figli all'interno
