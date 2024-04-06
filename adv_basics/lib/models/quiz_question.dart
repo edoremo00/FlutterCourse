@@ -6,6 +6,6 @@ class QuizQuestion{
   List<String> getShuffledAnswers(){
    final List<String> listcopy=[...answers];
    listcopy.shuffle();
-   return listcopy.length;
+   return listcopy;
   }
 }
