@@ -16,7 +16,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
   var currentQuestionIndex = 0;
 
   void answerQuestion(String answer) {
-    if (currentQuestionIndex + 1 > questions.length - 1) return;
     setState(() {
       currentQuestionIndex += 1;
     });

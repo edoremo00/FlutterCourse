@@ -9,6 +9,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
+    // return ResultsScreen();
     return const Quiz();
     // return MaterialApp(
     //   debugShowCheckedModeBanner: false,
