@@ -82,6 +82,7 @@ class _QuizState extends State<Quiz> {
           // child: activeScreen == "start-screen"
           //     ? StartScreen(switchscreenFn: switchScreen)
           //     : QuestionScreen(onSelectAnswer: addSelectedAnswer,),
+          // padding: EdgeInsets.all(40),
           child: activeScreenWidget,
         ),
       ),
