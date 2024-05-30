@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NewExpense extends StatefulWidget {
   const NewExpense({super.key});
@@ -11,7 +12,16 @@ class NewExpense extends StatefulWidget {
 class _NewExpenseState extends State<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
+  double previousPadding = 0.0;
 
+  // late String currencySymbol;
+  String currencySymbol="";
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+     retrieveCurrencySymbol();
+  }
   @override
   void dispose() {
     _titleController.dispose();
@@ -19,11 +29,26 @@ class _NewExpenseState extends State<NewExpense> {
     super.dispose();
   }
 
+  void retrieveCurrencySymbol(){
+    final locale=View.of(context).platformDispatcher.locale.toLanguageTag();
+    final formatted=NumberFormat.simpleCurrency(locale: locale);
+    if(formatted.currencySymbol !=currencySymbol){
+      setState(() {
+         currencySymbol=formatted.currencySymbol;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
+
+    //esempio closure inutile
+    // setBottompadding();
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
       padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom + 10,
+          bottom: MediaQuery.of(context).viewInsets.bottom,
           top: 16,
           left: 16,
           right: 16),
@@ -50,8 +75,9 @@ class _NewExpenseState extends State<NewExpense> {
           TextField(
             controller: _amountController,
             keyboardType: const TextInputType.numberWithOptions(),
-            decoration: const InputDecoration(
-              label: Text("Amount"),
+            decoration: InputDecoration(
+              label: const Text("Amount"),
+              prefixText: currencySymbol,
             ),
           ),
           Row(
@@ -66,4 +92,18 @@ class _NewExpenseState extends State<NewExpense> {
       ),
     );
   }
+
+  // void setBottompadding(){
+  //   var currentBottompadding=MediaQuery.of(context).viewInsets.bottom;
+  //   Function shouldBottompaddingChange=(double padding){
+  //     double result=(currentBottompadding>padding && currentBottompadding !=0.0) ? currentBottompadding : padding;
+  //     previousPadding=result;
+  //     if(result==padding) return currentBottompadding;
+  //     return result;
+  //   };
+  //   previousPadding=shouldBottompaddingChange(previousPadding);
+      
+  // }
+
 }
+
