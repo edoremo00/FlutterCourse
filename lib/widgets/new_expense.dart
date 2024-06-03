@@ -72,6 +72,7 @@ class _NewExpenseState extends State<NewExpense> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         // crossAxisAlignment: CrossAxisAlignment.end,
+        //TODO fix X button alignment
         children: [
           IconButton(
             onPressed: () {
@@ -137,6 +138,7 @@ class _NewExpenseState extends State<NewExpense> {
           const SizedBox(height: 16),
           SingleChildScrollView(scrollDirection: Axis.horizontal,child: Row(
             // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //TODO fix spacing between Chip
             children: [
               ...categoryIcons.entries.map(
                 (entry) => Chip(
