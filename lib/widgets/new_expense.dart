@@ -1,3 +1,5 @@
+import 'package:expensetracker/models/category.dart';
+import 'package:expensetracker/models/expense.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -12,16 +14,17 @@ class NewExpense extends StatefulWidget {
 class _NewExpenseState extends State<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
-  double previousPadding = 0.0;
 
-  // late String currencySymbol;
+  DateTime? _pickedDate;
   String currencySymbol="";
+
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-     retrieveCurrencySymbol();
+    retrieveCurrencySymbol();
   }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -29,19 +32,33 @@ class _NewExpenseState extends State<NewExpense> {
     super.dispose();
   }
 
-  void retrieveCurrencySymbol(){
-    final locale=View.of(context).platformDispatcher.locale.toLanguageTag();
-    final formatted=NumberFormat.simpleCurrency(locale: locale);
-    if(formatted.currencySymbol !=currencySymbol){
+  void retrieveCurrencySymbol() {
+    final locale = View.of(context).platformDispatcher.locale.toLanguageTag();
+    final formatted = NumberFormat.simpleCurrency(locale: locale);
+    if (formatted.currencySymbol != currencySymbol) {
       setState(() {
-         currencySymbol=formatted.currencySymbol;
+        currencySymbol = formatted.currencySymbol;
       });
     }
   }
 
+  void _openDatepicker() async{
+    final now=DateTime.now();
+    final firstdate=DateTime(now.year-1,now.month,now.day);
+    final pickedDate=await showDatePicker(
+      context: context,
+      firstDate: firstdate,
+      lastDate: now
+    );
+    _pickedDate=pickedDate;
+    setState(() {
+      
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
-
     //esempio closure inutile
     // setBottompadding();
     return AnimatedPadding(
@@ -54,7 +71,7 @@ class _NewExpenseState extends State<NewExpense> {
           right: 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
+        // crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           IconButton(
             onPressed: () {
@@ -72,14 +89,63 @@ class _NewExpenseState extends State<NewExpense> {
               label: Text("Title"),
             ),
           ),
-          TextField(
-            controller: _amountController,
-            keyboardType: const TextInputType.numberWithOptions(),
-            decoration: InputDecoration(
-              label: const Text("Amount"),
-              prefixText: currencySymbol,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _amountController,
+                  keyboardType: const TextInputType.numberWithOptions(),
+                  decoration: InputDecoration(
+                    label: const Text("Amount"),
+                    prefixText: currencySymbol,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 32,),
+
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 16),
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color:Colors.grey, width: 1.5),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //padding per muovere un filo più in giù testo ed allinearlo ad altro in altra textfield
+                        Padding(
+                        padding:const EdgeInsets.symmetric(vertical: 5),
+                        child: Text(
+                          _pickedDate!=null ? dateOnlyFormatter.format(_pickedDate!) : "Selected Date",
+                          style: const TextStyle(fontSize: 16,color: Color.fromARGB(255, 56, 56, 56),),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: _openDatepicker,
+                        icon: const Icon(Icons.calendar_month),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              
+            ],
           ),
+          const SizedBox(height: 16),
+          SingleChildScrollView(scrollDirection: Axis.horizontal,child: Row(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ...categoryIcons.entries.map(
+                (entry) => Chip(
+                  avatar: Icon(entry.value),
+                  label: Text(entry.key.name),
+                ),
+              )
+            ],
+          ),),
           Row(
             children: [
               ElevatedButton(
@@ -102,8 +168,6 @@ class _NewExpenseState extends State<NewExpense> {
   //     return result;
   //   };
   //   previousPadding=shouldBottompaddingChange(previousPadding);
-      
+
   // }
-
 }
-

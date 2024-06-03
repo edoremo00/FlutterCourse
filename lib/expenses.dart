@@ -43,12 +43,12 @@ class _ExpensesState extends State<Expenses> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: _openAddExpenseOverlay,
-            icon: const Icon(Icons.add),
-          )
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: _openAddExpenseOverlay,
+        //     icon: const Icon(Icons.add),
+        //   )
+        // ],
         title: const Text("Expense Tracker"),
       ),
       body: Column(
@@ -58,6 +58,7 @@ class _ExpensesState extends State<Expenses> {
           ExpensesList(expenses: _registeredExpenses),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(onPressed: _openAddExpenseOverlay, label: const Text("New Expense"),icon: Icon(Icons.add),),
     );
   }
 }

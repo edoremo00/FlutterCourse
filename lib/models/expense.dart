@@ -6,10 +6,9 @@ import 'package:uuid/uuid.dart';
 
 
 const uuid=Uuid();
-// final DateFormat formatter=DateFormat("d/MM/y hh:mm");
 
-// final formatter= DateFormat.yMd('it_IT');
 final formatter=DateFormat("d/MM/y hh:mm","it_IT");
+final dateOnlyFormatter=DateFormat("d/MM/y","it_IT");
 
 
 class Expense{
