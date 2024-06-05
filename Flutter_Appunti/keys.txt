@@ -1,0 +1,17 @@
+CHIAVI
+
+cosa sono le chiavi in flutter?
+
+	- mantengono lo stato quando i widget si muovono nel widget three---> Local keys
+	- possono essere usate per ricordare la posizione di scroll dell'utente
+	- mantenere stato quando modifico una collection (eg lista in caso di flutter listview)
+
+quando usare le chiavi in flutter?
+
+	- per la maggiorparte delle volte non servono
+	- se mi ritrovo a modificare/ riordinare collection di widget allora devo usarle
+
+
+PER ALTRI DETTAGLI
+
+https://www.youtube.com/watch?v=kn0EOS-ZiIc&t=413s
