@@ -7,8 +7,8 @@ import 'package:uuid/uuid.dart';
 
 const uuid=Uuid();
 
-final formatter=DateFormat("d/MM/y hh:mm","it_IT");
-final dateOnlyFormatter=DateFormat("d/MM/y","it_IT");
+final formatter=DateFormat("d/MM/y","it_IT");
+
 
 
 class Expense{

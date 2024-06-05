@@ -1,13 +1,11 @@
 import 'package:expensetracker/models/category.dart';
 import 'package:expensetracker/models/expense.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 class NewExpense extends StatefulWidget {
-  const NewExpense({super.key});
+  final void Function(Expense newxp) onAddExpense;
+  const NewExpense({super.key,required this.onAddExpense});
   @override
   State<StatefulWidget> createState() {
     return _NewExpenseState();
@@ -120,12 +118,18 @@ class _NewExpenseState extends State<NewExpense> {
       );
       return;
     }
-    //TODO add logic for adding and refresh expense list
+
     Expense newexp = Expense(
         title: _titleController.text,
         amount: enteredAmount,
         date: _pickedDate!,
         category: _selectedCategory!);
+
+  //call add function passed from expenses list page
+    widget.onAddExpense(newexp);
+
+    //close modal bottom sheet
+    Navigator.pop(context);
    
   }
 
@@ -193,7 +197,7 @@ class _NewExpenseState extends State<NewExpense> {
                         Padding(
                         padding:const EdgeInsets.symmetric(vertical: 5),
                         child: Text(
-                          _pickedDate!=null ? dateOnlyFormatter.format(_pickedDate!) : "Selected Date",
+                          _pickedDate!=null ? formatter.format(_pickedDate!) : "Selected Date",
                           style: const TextStyle(fontSize: 16,color: Color.fromARGB(255, 56, 56, 56),),
                         ),
                       ),

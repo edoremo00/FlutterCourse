@@ -35,7 +35,24 @@ class _ExpensesState extends State<Expenses> {
     //eg statefulwidget
     //context--> metadati ogni widget ha il suo. contiene info sul widget e su sua posizione in widget tree
     //builder è una funzione che ritorna un widget
-   showModalBottomSheet(isScrollControlled: true,isDismissible: false,context: context, builder: (ctx)=>const NewExpense());
+   showModalBottomSheet(
+      isScrollControlled: true,
+      isDismissible: false,
+      context: context,
+      builder: (ctx) => NewExpense(onAddExpense: _addExpense,),
+    );
+  }
+
+  void _addExpense(Expense newexp){
+    setState(() {
+      _registeredExpenses.add(newexp);
+    });
+  }
+
+  void _removeExpense(int index){
+    setState(() {
+      _registeredExpenses.removeAt(index);
+    });
   }
 
 
@@ -55,10 +72,10 @@ class _ExpensesState extends State<Expenses> {
         // mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text("Chart"),
-          ExpensesList(expenses: _registeredExpenses),
+          ExpensesList(expenses: _registeredExpenses,onRemoveExpense: _removeExpense,),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(onPressed: _openAddExpenseOverlay, label: const Text("New Expense"),icon: Icon(Icons.add),),
+      floatingActionButton: FloatingActionButton.extended(onPressed: _openAddExpenseOverlay, label: const Text("New Expense"),icon: const Icon(Icons.add),),
     );
   }
 }
