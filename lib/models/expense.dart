@@ -12,16 +12,16 @@ final formatter=DateFormat("d/MM/y","it_IT");
 
 class Expense{
   final String id;
-  final String title;
-  final double amount;
-  final DateTime _date;
-  final Category category;
+  String title;
+  double amount;
+  DateTime date;
+  Category category;
 
 //https://dart.dev/language/constructors#use-an-initializer-list questa feature di dart mi permette di 
 //inizializzare l'id prima che il costruttore venga eseguito
-  Expense({required this.title,required this.amount,required DateTime date,required this.category}) :id=uuid.v4(),_date=date;
+  Expense({required this.title,required this.amount,required DateTime expdate,required this.category}) :id=uuid.v4(),date=expdate;
 
   String get formattedDate{
-    return formatter.format(_date);
+    return formatter.format(date);
   }
 }
