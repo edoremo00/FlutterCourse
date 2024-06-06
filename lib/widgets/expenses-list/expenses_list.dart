@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 class ExpensesList extends StatelessWidget {
   final List<Expense> expenses;
   final void Function(Expense exp) onRemoveExpense;
+  final void Function({Expense? expenseToedit}) onModifyswipeDirection;
 
-  const ExpensesList({super.key, required this.expenses,required this.onRemoveExpense});
+  const ExpensesList({super.key, required this.expenses,required this.onRemoveExpense,required this.onModifyswipeDirection});
 
   @override
   Widget build(BuildContext context) {
@@ -19,24 +20,44 @@ class ExpensesList extends StatelessWidget {
             //keys--> vedi appunti per dettagli
             final rndColor=ExpenseRandomColorManager.getRandomDismissibleBackground(index);
             return Dismissible(
+              dismissThresholds: const {DismissDirection.startToEnd:0.1,DismissDirection.endToStart:0.1},
               onDismissed: (direction) {
                 onRemoveExpense(expenses[index]);
               },
+              confirmDismiss: (direction) async{
+                //modify
+                if(direction==DismissDirection.endToStart){
+                  //open modal to edit
+                  //TODO finish edit implementation
+                  onModifyswipeDirection(expenseToedit:expenses[index]);
+                  return false;
+                  
+                }
+                //delete
+                return true;
+              },
+              //delete
               background: Container(
-                color: rndColor,
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Icon(Icons.delete),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Icon(Icons.delete),
-                    )
-                  ],
+                color: rndColor.primary,
+                child: const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Icon(Icons.delete),
+                  ),
                 ),
+              
+              ),
+              //edit
+              secondaryBackground: Container(
+                color: rndColor.secondary,
+                child: const Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Icon(Icons.edit),
+                      ),
+                )
               ),
               key: ValueKey(expenses[index]),
               child: ExpenseItem(expenseitem: expenses[index]),
