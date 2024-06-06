@@ -15,130 +15,22 @@ class Expenses extends StatefulWidget {
 
 class _ExpensesState extends State<Expenses> {
   final List<Expense> _registeredExpenses = [
-    // Expense(
-    //   title: "Flutter Course",
-    //   amount: 9.99,
-    //   date: DateTime.now(),
-    //   category: Category.work,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-    // Expense(
-    //   title: "Cinema",
-    //   amount: 16.99,
-    //   date: DateTime.now(),
-    //   category: Category.leisure,
-    // ),
-
+    Expense(
+      title: "Flutter Course",
+      amount: 9.99,
+      expdate: DateTime.now(),
+      category: Category.work,
+    ),
+    Expense(
+      title: "Cinema",
+      amount: 16.99,
+      expdate: DateTime.now(),
+      category: Category.leisure,
+    ),
+    
   ];
 
-  void _openAddExpenseOverlay(){
+  void _openAddExpenseOverlay({Expense? expenseToedit}){
 
     //context è resa disponibile da flutter in automatico dato che siamo in una classe che estende state
     //eg statefulwidget
@@ -148,7 +40,7 @@ class _ExpensesState extends State<Expenses> {
       isScrollControlled: true,
       isDismissible: false,
       context: context,
-      builder: (ctx) => NewExpense(onAddExpense: _addExpense,),
+      builder: (ctx) => NewExpense(onAddExpense: _addExpense,onModifyExpense: _modifyExpense,existingExpense: expenseToedit,),
     );
   }
 
@@ -163,6 +55,7 @@ class _ExpensesState extends State<Expenses> {
     setState(() {
       _registeredExpenses.remove(exp);
     });
+    //TODO move Scaffold in a separate file and make it as a custom widget
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -178,9 +71,23 @@ class _ExpensesState extends State<Expenses> {
     );
   }
 
-  //TODO implement modify expense and change dismissible to handle it
-  void _modifyExpense(Expense old){
-
+  
+  void _modifyExpense(Expense edited){
+   final editedExpenseIndex=_registeredExpenses.indexOf(edited);
+   if(editedExpenseIndex>-1){
+     setState(() {
+      _registeredExpenses[editedExpenseIndex]=edited;
+     });
+   }
+   //SEE  ABOVE TODO!!!
+   ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 3),
+        content: Text('Expense Updated'),
+      ),
+    );
   }
 
 
@@ -216,7 +123,7 @@ class _ExpensesState extends State<Expenses> {
             const Spacer()
           ]else ...[
              ExpensesList(
-              expenses: _registeredExpenses, onRemoveExpense: _removeExpense),
+              expenses: _registeredExpenses, onRemoveExpense: _removeExpense,onModifyswipeDirection: _openAddExpenseOverlay,),
           ]
           
         ],
