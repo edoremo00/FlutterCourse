@@ -5,7 +5,9 @@ import 'package:intl/intl.dart';
 
 class NewExpense extends StatefulWidget {
   final void Function(Expense newxp) onAddExpense;
-  const NewExpense({super.key,required this.onAddExpense});
+  final void Function(Expense modexp) onModifyExpense;
+  Expense? existingExpense;
+  NewExpense({super.key,required this.onAddExpense,required this.onModifyExpense,this.existingExpense});
   @override
   State<StatefulWidget> createState() {
     return _NewExpenseState();
@@ -13,8 +15,10 @@ class NewExpense extends StatefulWidget {
 }
 
 class _NewExpenseState extends State<NewExpense> {
-  final _titleController = TextEditingController();
-  final _amountController = TextEditingController();
+  // final _titleController = TextEditingController();
+  // final _amountController = TextEditingController();
+  late TextEditingController _titleController;
+  late TextEditingController _amountController;
 
   DateTime? _pickedDate;
   String currencySymbol="";
@@ -22,6 +26,14 @@ class _NewExpenseState extends State<NewExpense> {
 
   Category? _selectedCategory;
 
+ @override
+  void initState() {
+    super.initState();
+    _titleController=TextEditingController(text: widget.existingExpense?.title ?? "");
+    _amountController=TextEditingController(text:widget.existingExpense?.amount.toString() ?? "");
+    widget.existingExpense?.date !=null ? _pickedDate=widget.existingExpense?.date : _pickedDate;
+    widget.existingExpense?.category !=null ? _selectedCategory=widget.existingExpense?.category : _selectedCategory;
+  }
 
   @override
   void didChangeDependencies() {
@@ -118,16 +130,27 @@ class _NewExpenseState extends State<NewExpense> {
       );
       return;
     }
+    if(widget.existingExpense!=null){
+        //do the editing
+        widget.existingExpense!.title=_titleController.text;
+        widget.existingExpense!.amount=enteredAmount;
+        widget.existingExpense!.category=_selectedCategory!;
+        widget.existingExpense!.date=_pickedDate!;
+        widget.onModifyExpense(widget.existingExpense!);
+        
+    }else{
+      Expense newexp = Expense(
 
-    Expense newexp = Expense(
-        title: _titleController.text,
-        amount: enteredAmount,
-        date: _pickedDate!,
-        category: _selectedCategory!);
+          title: _titleController.text,
+          amount: enteredAmount,
+          expdate: _pickedDate!,
+          category: _selectedCategory!);
 
-  //call add function passed from expenses list page
-    widget.onAddExpense(newexp);
+      //call add function passed from expenses list page
+      widget.onAddExpense(newexp);
 
+    }
+    
     //close modal bottom sheet
     Navigator.pop(context);
    
