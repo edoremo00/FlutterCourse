@@ -1,6 +1,5 @@
 
 import 'package:expensetracker/models/category.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
@@ -23,8 +22,6 @@ class Expense{
   Expense({required this.title,required this.amount,required DateTime date,required this.category}) :id=uuid.v4(),_date=date;
 
   String get formattedDate{
-    // return formatter.format(_date);
-    initializeDateFormatting();
     return formatter.format(_date);
   }
 }

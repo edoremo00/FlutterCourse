@@ -15,18 +15,127 @@ class Expenses extends StatefulWidget {
 
 class _ExpensesState extends State<Expenses> {
   final List<Expense> _registeredExpenses = [
-    Expense(
-      title: "Flutter Course",
-      amount: 9.99,
-      date: DateTime.now(),
-      category: Category.work,
-    ),
-    Expense(
-      title: "Cinema",
-      amount: 16.99,
-      date: DateTime.now(),
-      category: Category.leisure,
-    )
+    // Expense(
+    //   title: "Flutter Course",
+    //   amount: 9.99,
+    //   date: DateTime.now(),
+    //   category: Category.work,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+    // Expense(
+    //   title: "Cinema",
+    //   amount: 16.99,
+    //   date: DateTime.now(),
+    //   category: Category.leisure,
+    // ),
+
   ];
 
   void _openAddExpenseOverlay(){
@@ -49,15 +158,40 @@ class _ExpensesState extends State<Expenses> {
     });
   }
 
-  void _removeExpense(int index){
+  void _removeExpense(Expense exp){
+    final expenseIndex= _registeredExpenses.indexOf(exp);
     setState(() {
-      _registeredExpenses.removeAt(index);
+      _registeredExpenses.remove(exp);
     });
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+        content: const Text('Expense Deleted'),
+        action: SnackBarAction(label: "Undo",onPressed: () {
+          setState(() {
+            _registeredExpenses.insert(expenseIndex, exp);
+          });
+        },)
+      ),
+    );
+  }
+
+  //TODO implement modify expense and change dismissible to handle it
+  void _modifyExpense(Expense old){
+
   }
 
 
   @override
   Widget build(BuildContext context) {
+    // Widget mainContent = _registeredExpenses.isNotEmpty
+    //     ? ExpensesList(
+    //         expenses: _registeredExpenses, onRemoveExpense: _removeExpense)
+    //     : const Center(
+    //         child: Text("No expenses found. Start adding some!"),
+    //       );
     return Scaffold(
       appBar: AppBar(
         // actions: [
@@ -69,10 +203,22 @@ class _ExpensesState extends State<Expenses> {
         title: const Text("Expense Tracker"),
       ),
       body: Column(
-        // mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text("Chart"),
-          ExpensesList(expenses: _registeredExpenses,onRemoveExpense: _removeExpense,),
+          //spacer prende quanto spazio possibile e lo divide equamente tra i due widget qua presenti
+          //conditonal list per evitare di fare un expanded che wrappa colonna ecc
+          if(_registeredExpenses.isEmpty)...[
+            const Spacer(),
+            const Center(
+              child: Text("No expenses found. Start adding some!"),
+            ),
+             CircleAvatar(child: IconButton(onPressed: _openAddExpenseOverlay, icon: const Icon(Icons.add)),),
+            const Spacer()
+          ]else ...[
+             ExpensesList(
+              expenses: _registeredExpenses, onRemoveExpense: _removeExpense),
+          ]
+          
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(onPressed: _openAddExpenseOverlay, label: const Text("New Expense"),icon: const Icon(Icons.add),),

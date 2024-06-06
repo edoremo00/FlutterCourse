@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class ExpensesList extends StatelessWidget {
   final List<Expense> expenses;
-  final void Function(int id) onRemoveExpense;
+  final void Function(Expense exp) onRemoveExpense;
 
   const ExpensesList({super.key, required this.expenses,required this.onRemoveExpense});
 
@@ -20,7 +20,7 @@ class ExpensesList extends StatelessWidget {
             final rndColor=ExpenseRandomColorManager.getRandomDismissibleBackground(index);
             return Dismissible(
               onDismissed: (direction) {
-                onRemoveExpense(index);
+                onRemoveExpense(expenses[index]);
               },
               background: Container(
                 color: rndColor,
