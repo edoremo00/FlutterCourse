@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 class ExpenseItem extends StatelessWidget {
   final Expense expenseitem;
-  const ExpenseItem({super.key, required this.expenseitem});
+  String currencySymbol;
+  ExpenseItem({super.key, required this.expenseitem,required this.currencySymbol});
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -20,7 +21,7 @@ class ExpenseItem extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '\$${expenseitem.amount.toStringAsFixed(2)}',
+                 "$currencySymbol${expenseitem.amount.toStringAsFixed(2)}"
                 ),
                 const Spacer(),
                 Icon(categoryIcons[expenseitem.category]),

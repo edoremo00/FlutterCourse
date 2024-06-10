@@ -7,7 +7,8 @@ class NewExpense extends StatefulWidget {
   final void Function(Expense newxp) onAddExpense;
   final void Function(Expense modexp) onModifyExpense;
   Expense? existingExpense;
-  NewExpense({super.key,required this.onAddExpense,required this.onModifyExpense,this.existingExpense});
+  String? currencySymbol;
+  NewExpense({super.key,required this.onAddExpense,required this.onModifyExpense,required this.currencySymbol,this.existingExpense});
   @override
   State<StatefulWidget> createState() {
     return _NewExpenseState();
@@ -21,7 +22,6 @@ class _NewExpenseState extends State<NewExpense> {
   late TextEditingController _amountController;
 
   DateTime? _pickedDate;
-  String currencySymbol="";
   
 
   Category? _selectedCategory;
@@ -35,27 +35,12 @@ class _NewExpenseState extends State<NewExpense> {
     widget.existingExpense?.category !=null ? _selectedCategory=widget.existingExpense?.category : _selectedCategory;
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    retrieveCurrencySymbol();
-  }
 
   @override
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
     super.dispose();
-  }
-
-  void retrieveCurrencySymbol() {
-    final locale = View.of(context).platformDispatcher.locale.toLanguageTag();
-    final formatted = NumberFormat.simpleCurrency(locale: locale);
-    if (formatted.currencySymbol != currencySymbol) {
-      setState(() {
-        currencySymbol = formatted.currencySymbol;
-      });
-    }
   }
 
   void _openDatepicker() async{
@@ -198,7 +183,7 @@ class _NewExpenseState extends State<NewExpense> {
                   keyboardType: const TextInputType.numberWithOptions(),
                   decoration: InputDecoration(
                     label: const Text("Amount"),
-                    prefixText: currencySymbol,
+                    prefixText: widget.currencySymbol,
                   ),
                 ),
               ),

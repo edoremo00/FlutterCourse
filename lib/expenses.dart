@@ -1,7 +1,9 @@
 import 'package:expensetracker/widgets/expenses-list/expenses_list.dart';
 import 'package:expensetracker/models/expense.dart';
 import 'package:expensetracker/widgets/new_expense.dart';
+import 'package:expensetracker/widgets/global_snackbar.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'models/category.dart';
 
@@ -29,6 +31,24 @@ class _ExpensesState extends State<Expenses> {
     ),
     
   ];
+  String? currencySymbol;
+
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    retrieveCurrencySymbol();
+  }
+
+    void retrieveCurrencySymbol() {
+    final locale = View.of(context).platformDispatcher.locale.toLanguageTag();
+    final formatted = NumberFormat.simpleCurrency(locale: locale);
+    if (formatted.currencySymbol != currencySymbol) {
+      setState(() {
+        currencySymbol = formatted.currencySymbol;
+      });
+    }
+  }
 
   void _openAddExpenseOverlay({Expense? expenseToedit}){
 
@@ -40,7 +60,7 @@ class _ExpensesState extends State<Expenses> {
       isScrollControlled: true,
       isDismissible: false,
       context: context,
-      builder: (ctx) => NewExpense(onAddExpense: _addExpense,onModifyExpense: _modifyExpense,existingExpense: expenseToedit,),
+      builder: (ctx) => NewExpense(onAddExpense: _addExpense,onModifyExpense: _modifyExpense,existingExpense: expenseToedit,currencySymbol: currencySymbol,),
     );
   }
 
@@ -55,18 +75,19 @@ class _ExpensesState extends State<Expenses> {
     setState(() {
       _registeredExpenses.remove(exp);
     });
-    //TODO move Scaffold in a separate file and make it as a custom widget
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+    GlobalSnackBar.clearSnackBars(context);
+    GlobalSnackBar.show(
+      context,
+      GlobalSnackBar(
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
-        content: const Text('Expense Deleted'),
-        action: SnackBarAction(label: "Undo",onPressed: () {
-          setState(() {
+        contentText: "Expense Deleted",
+        action: SnackBarAction(
+          label: "Undo",
+          onPressed: () => setState(() {
             _registeredExpenses.insert(expenseIndex, exp);
-          });
-        },)
+          }),
+        ),
       ),
     );
   }
@@ -79,13 +100,14 @@ class _ExpensesState extends State<Expenses> {
       _registeredExpenses[editedExpenseIndex]=edited;
      });
    }
-   //SEE  ABOVE TODO!!!
-   ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+
+   GlobalSnackBar.clearSnackBars(context);
+    GlobalSnackBar.show(
+      context,
+      const GlobalSnackBar(
         behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: 3),
-        content: Text('Expense Updated'),
+        contentText: "Expense Updated",
       ),
     );
   }
@@ -123,7 +145,7 @@ class _ExpensesState extends State<Expenses> {
             const Spacer()
           ]else ...[
              ExpensesList(
-              expenses: _registeredExpenses, onRemoveExpense: _removeExpense,onModifyswipeDirection: _openAddExpenseOverlay,),
+              expenses: _registeredExpenses, onRemoveExpense: _removeExpense,onModifyswipeDirection: _openAddExpenseOverlay,currencySymbol: currencySymbol!,),
           ]
           
         ],

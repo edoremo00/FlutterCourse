@@ -7,8 +7,9 @@ class ExpensesList extends StatelessWidget {
   final List<Expense> expenses;
   final void Function(Expense exp) onRemoveExpense;
   final void Function({Expense? expenseToedit}) onModifyswipeDirection;
+  String currencySymbol;
 
-  const ExpensesList({super.key, required this.expenses,required this.onRemoveExpense,required this.onModifyswipeDirection});
+  ExpensesList({super.key, required this.expenses,required this.onRemoveExpense,required this.onModifyswipeDirection,required this.currencySymbol});
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +61,7 @@ class ExpensesList extends StatelessWidget {
                 )
               ),
               key: ValueKey(expenses[index]),
-              child: ExpenseItem(expenseitem: expenses[index]),
+              child: ExpenseItem(expenseitem: expenses[index],currencySymbol: currencySymbol,),
             );
           }),
     );
