@@ -1,0 +1,8 @@
+per gestire tema applicazione flutter in un posto centralizzato usiamo MaterialApp inoltre fornisce altre impostazioni che possiamo usare in tutta l'applicazione 
+per temi si usa oggetto Themedata. usandolo diciamo a flutter che stiamo configurando il tema da zero sovrascrivendo stili di default
+
+per evitare questo problema usiamo themedata().copywith il che ci permette di copiare il tema esistente e modifcare solo gli aspetti di nostro interesse
+
+SETTARE COLORI
+
+	- è raccomandato usare propriety colorscheme per impostarli. questo ci permette di evitare di impostare i vari colori. noi andremo a definire uno schema e flutter in automatico prenderà delle sfumature di questi colori per impostarli come colori nei vari widget
