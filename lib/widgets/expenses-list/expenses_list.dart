@@ -29,7 +29,6 @@ class ExpensesList extends StatelessWidget {
                 //modify
                 if(direction==DismissDirection.endToStart){
                   //open modal to edit
-                  //TODO finish edit implementation
                   onModifyswipeDirection(expenseToedit:expenses[index]);
                   return false;
                   

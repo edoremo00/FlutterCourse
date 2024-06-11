@@ -1,7 +1,7 @@
 import 'package:expensetracker/models/category.dart';
 import 'package:expensetracker/models/expense.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
 
 class NewExpense extends StatefulWidget {
   final void Function(Expense newxp) onAddExpense;
@@ -20,6 +20,8 @@ class _NewExpenseState extends State<NewExpense> {
   // final _amountController = TextEditingController();
   late TextEditingController _titleController;
   late TextEditingController _amountController;
+  late TextEditingController _datecontroller;
+  final FocusNode _dateFocusNode = FocusNode(); 
 
   DateTime? _pickedDate;
   
@@ -31,6 +33,7 @@ class _NewExpenseState extends State<NewExpense> {
     super.initState();
     _titleController=TextEditingController(text: widget.existingExpense?.title ?? "");
     _amountController=TextEditingController(text:widget.existingExpense?.amount.toString() ?? "");
+    _datecontroller=TextEditingController(text:widget.existingExpense?.formattedDate ?? "");
     widget.existingExpense?.date !=null ? _pickedDate=widget.existingExpense?.date : _pickedDate;
     widget.existingExpense?.category !=null ? _selectedCategory=widget.existingExpense?.category : _selectedCategory;
   }
@@ -48,19 +51,30 @@ class _NewExpenseState extends State<NewExpense> {
     final firstdate=DateTime(now.year-1,DateTime.january);
     final pickedDate=await showDatePicker(
       context: context,
+      initialDate: _datecontroller.text.isEmpty ? DateTime.now() : formatter.parse(_datecontroller.text),
       firstDate: firstdate,
-      lastDate: now
+      lastDate: now,
     );
-    setState(() {
-      _pickedDate=pickedDate;
-    });
+    if(pickedDate!=null){
+      setState(() {
+        _datecontroller.text=formatter.format(pickedDate);
+      });
+    }else{
+      if(!context.mounted) return;
+      // Remove focus when cancel is pressed from datepicker
+      _dateFocusNode.unfocus();      
+    }
+    // setState(() {
+    //   _pickedDate=pickedDate;
+    // });
   }
 
   void _submitExpenseData(){
     final enteredAmount = double.tryParse(_amountController.text);
     final isAmountinvalid = enteredAmount == null || enteredAmount <= 0;
     final isCategoryinvalid = _selectedCategory == null;
-    final isDateinvalid = _pickedDate == null;
+    final enteredDate = formatter.tryParse(_datecontroller.text);
+    final isDateinvalid=enteredDate==null;
     if (_titleController.text.trim().isEmpty ||
         isAmountinvalid ||
         isCategoryinvalid ||
@@ -120,7 +134,7 @@ class _NewExpenseState extends State<NewExpense> {
         widget.existingExpense!.title=_titleController.text;
         widget.existingExpense!.amount=enteredAmount;
         widget.existingExpense!.category=_selectedCategory!;
-        widget.existingExpense!.date=_pickedDate!;
+        widget.existingExpense!.date=enteredDate;
         widget.onModifyExpense(widget.existingExpense!);
         
     }else{
@@ -128,7 +142,7 @@ class _NewExpenseState extends State<NewExpense> {
 
           title: _titleController.text,
           amount: enteredAmount,
-          expdate: _pickedDate!,
+          expdate: enteredDate,
           category: _selectedCategory!);
 
       //call add function passed from expenses list page
@@ -151,107 +165,148 @@ class _NewExpenseState extends State<NewExpense> {
       curve: Curves.easeOut,
       padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
-          top: 16,
           left: 16,
-          right: 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        //TODO test multiple chips inside a row with mainaxisalignemt to see if spacing works
-        children: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(
-              Icons.close,
-              color: Colors.black,
-            ),
-          ),
-          TextField(
-            controller: _titleController,
-            maxLength: 50,
-            decoration: const InputDecoration(
-              label: Text("Title"),
-            ),
-          ),
-          Row(
+          right: 16,
+          top:20
+         ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            //TODO test multiple chips inside a row with mainaxisalignemt to see if spacing works
             children: [
-              Expanded(
-                child: TextField(
-                  controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(),
-                  decoration: InputDecoration(
-                    label: const Text("Amount"),
-                    prefixText: widget.currencySymbol,
-                  ),
+              TextField(
+                controller: _titleController,
+                maxLength: 50,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.only(bottom: 8),
+                  label: Text("Title"),
                 ),
               ),
-              const SizedBox(width: 32,),
-
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.only(top: 16),
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color:Colors.grey, width: 1.5),
+              const SizedBox(height: 16,),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _amountController,
+                      keyboardType: const TextInputType.numberWithOptions(),
+                      decoration: InputDecoration(
+                        
+                        contentPadding: EdgeInsets.zero,
+                        label: const Text("Amount"),
+                        prefixText: widget.currencySymbol,
+                      ),
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      //padding per muovere un filo più in giù testo ed allinearlo ad altro in altra textfield
-                        Padding(
-                        padding:const EdgeInsets.symmetric(vertical: 5),
-                        child: Text(
-                          _pickedDate!=null ? formatter.format(_pickedDate!) : "Selected Date",
-                          style: const TextStyle(fontSize: 16,color: Color.fromARGB(255, 56, 56, 56),),
+                  const SizedBox(width: 32,),
+                  Expanded(
+                      child: TextField(
+                        focusNode: _dateFocusNode,
+                        controller: _datecontroller,
+                        readOnly: true,
+                        onTap: _openDatepicker,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.zero,
+                          label: const Text("Date"),
+                          prefixIcon: Ink(
+                            child: const Icon(Icons.calendar_month),
+                          ),
                         ),
                       ),
-                      IconButton(
-                        onPressed: _openDatepicker,
-                        icon: const Icon(Icons.calendar_month),
-                      )
-                    ],
-                  ),
-                ),
-              ),
+                    )
               
+                  //OLD DATE PICKER IMPLEMENTATION AND STYLING
+                  // Expanded(
+                  //   child: InkWell(
+                  //     onTap: _openDatepicker,
+                  //     child: Container(
+                  //       alignment: Alignment.topRight,
+                  //       decoration: const BoxDecoration(
+                  //         border: Border(
+                  //           bottom: BorderSide(color:Colors.grey, width: 1.5),
+                  //         ),
+                  //       ),
+                  //       child: SizedBox(
+                  //         height: 40,
+                  //         child: Row(
+                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //           crossAxisAlignment: CrossAxisAlignment.center,
+                  //           children: [
+                  //             //padding per muovere un filo più in giù testo ed allinearlo ad altro in altra textfield
+                  //               Text(
+                  //                 _pickedDate!=null ? formatter.format(_pickedDate!) : "Selected Date",
+                  //                 style: const TextStyle(fontSize: 16,color: Color.fromARGB(255, 56, 56, 56),),
+                  //               ),
+                  //             IconButton(
+                  //               onPressed: _openDatepicker,
+                  //               icon: const Icon(Icons.calendar_month),
+                  //             )
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  
+                ],
+              ),
+              const SizedBox(height: 32),
+              SingleChildScrollView(scrollDirection: Axis.horizontal,clipBehavior: Clip.hardEdge,child: Wrap(
+                spacing: 16,
+                children: [
+                  ...categoryIcons.entries.map(
+                    (entry) {
+                      return ChoiceChip(
+                      showCheckmark: false,
+                      selected: _selectedCategory==entry.key,
+                      onSelected: (_){
+                        setState(() {
+                          _selectedCategory=entry.key;
+                        });
+                      },
+                      padding: const EdgeInsets.all(6),
+                      labelPadding: const EdgeInsets.all(6),
+                      avatar: CircleAvatar(child: Icon(entry.value),),
+                      label: Text(entry.key.name.toUpperCase(),),
+                    );} 
+                    
+                  ),
+                ],
+              ),),
+              const SizedBox(height: 16,),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: _submitExpenseData,
+                      child: const Text("Save",style: TextStyle(fontSize: 16),),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
-          const SizedBox(height: 32),
-          SingleChildScrollView(scrollDirection: Axis.horizontal,clipBehavior: Clip.none,child: Wrap(
-            spacing: 16,
-            children: [
-              ...categoryIcons.entries.map(
-                (entry) {
-                  return ChoiceChip(
-                  showCheckmark: false,
-                  selected: _selectedCategory==entry.key,
-                  onSelected: (_){
-                    setState(() {
-                      _selectedCategory=entry.key;
-                    });
-                  },
-                  padding: const EdgeInsets.all(6),
-                  labelPadding: const EdgeInsets.all(6),
-                  avatar: CircleAvatar(child: Icon(entry.value),),
-                  label: Text(entry.key.name.toUpperCase(),),
-                );} 
-                
+        ),
+          Positioned(
+            top: -20,
+            right: -16,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: CircleAvatar(
+                backgroundColor: const Color.fromARGB(255, 219, 219, 219),
+                child: IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
-            ],
-          ),),
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: _submitExpenseData,
-                child: const Text("Save"),
-              ),
-            ],
-          )
+            ),
+          ),
         ],
+        
       ),
     );
   }
