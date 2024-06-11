@@ -1,4 +1,3 @@
-import 'package:expensetracker/helpers/expense_rnd_color_manager.dart';
 import 'package:expensetracker/models/expense.dart';
 import 'package:expensetracker/widgets/expenses-list/expense_item.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +18,8 @@ class ExpensesList extends StatelessWidget {
           itemCount: expenses.length,
           itemBuilder: (context, index) {
             //keys--> vedi appunti per dettagli
-            final rndColor=ExpenseRandomColorManager.getRandomDismissibleBackground(index);
+            //NOT USED ANYMORE
+            // final rndColor=ExpenseRandomColorManager.getRandomDismissibleBackground(index);
             return Dismissible(
               dismissThresholds: const {DismissDirection.startToEnd:0.1,DismissDirection.endToStart:0.1},
               onDismissed: (direction) {
@@ -38,7 +38,8 @@ class ExpensesList extends StatelessWidget {
               },
               //delete
               background: Container(
-                color: rndColor.primary,
+                margin:EdgeInsets.symmetric(horizontal: Theme.of(context).cardTheme.margin!.horizontal),
+                color: Theme.of(context).colorScheme.error,
                 child: const Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
@@ -50,7 +51,8 @@ class ExpensesList extends StatelessWidget {
               ),
               //edit
               secondaryBackground: Container(
-                color: rndColor.secondary,
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                margin:EdgeInsets.symmetric(horizontal: Theme.of(context).cardTheme.margin!.horizontal),
                 child: const Align(
                   alignment: Alignment.centerRight,
                   child: Padding(

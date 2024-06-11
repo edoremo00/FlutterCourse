@@ -73,7 +73,7 @@ class _NewExpenseState extends State<NewExpense> {
     final enteredAmount = double.tryParse(_amountController.text);
     final isAmountinvalid = enteredAmount == null || enteredAmount <= 0;
     final isCategoryinvalid = _selectedCategory == null;
-    final enteredDate = formatter.tryParse(_datecontroller.text);
+    final enteredDate =DateTime.tryParse(_datecontroller.text);
     final isDateinvalid=enteredDate==null;
     if (_titleController.text.trim().isEmpty ||
         isAmountinvalid ||
@@ -195,7 +195,6 @@ class _NewExpenseState extends State<NewExpense> {
                       controller: _amountController,
                       keyboardType: const TextInputType.numberWithOptions(),
                       decoration: InputDecoration(
-                        
                         contentPadding: EdgeInsets.zero,
                         label: const Text("Amount"),
                         prefixText: widget.currencySymbol,
@@ -297,7 +296,6 @@ class _NewExpenseState extends State<NewExpense> {
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: CircleAvatar(
-                backgroundColor: const Color.fromARGB(255, 219, 219, 219),
                 child: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
