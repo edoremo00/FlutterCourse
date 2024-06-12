@@ -99,9 +99,7 @@ class _ExpensesState extends State<Expenses> {
      setState(() {
       _registeredExpenses[editedExpenseIndex]=edited;
      });
-   }
-
-   GlobalSnackBar.clearSnackBars(context);
+    GlobalSnackBar.clearSnackBars(context);
     GlobalSnackBar.show(
       context,
       const GlobalSnackBar(
@@ -110,6 +108,7 @@ class _ExpensesState extends State<Expenses> {
         contentText: "Expense Updated",
       ),
     );
+   }
   }
 
 

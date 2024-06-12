@@ -43,6 +43,9 @@ void main() {
           ),
       //circleavatar theming for dark mode
       primaryColorLight: kDarkColorScheme.inversePrimary,
+      chipTheme: const ChipThemeData().copyWith(
+        selectedColor: kDarkColorScheme.primaryContainer
+      ),
       textTheme:ThemeData(brightness: Brightness.dark).textTheme.copyWith(
           titleLarge: TextStyle(
             fontWeight: FontWeight.bold,
