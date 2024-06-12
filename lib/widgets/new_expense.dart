@@ -59,11 +59,11 @@ class _NewExpenseState extends State<NewExpense> {
       setState(() {
         _datecontroller.text=formatter.format(pickedDate);
       });
-    }else{
-      if(!context.mounted) return;
-      // Remove focus when cancel is pressed from datepicker
-      _dateFocusNode.unfocus();      
     }
+    if(!context.mounted) return;
+    // Remove focus when cancel is pressed from datepicker
+    _dateFocusNode.unfocus();      
+    
     // setState(() {
     //   _pickedDate=pickedDate;
     // });
@@ -73,7 +73,7 @@ class _NewExpenseState extends State<NewExpense> {
     final enteredAmount = double.tryParse(_amountController.text);
     final isAmountinvalid = enteredAmount == null || enteredAmount <= 0;
     final isCategoryinvalid = _selectedCategory == null;
-    final enteredDate =DateTime.tryParse(_datecontroller.text);
+    final enteredDate =formatter.tryParse(_datecontroller.text);
     final isDateinvalid=enteredDate==null;
     if (_titleController.text.trim().isEmpty ||
         isAmountinvalid ||
