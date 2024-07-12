@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 //usare k nel nome è convenzione per variabili globali
+//metodo from seed mi crea una palette di colori da usare per mia app a partire da un dato colore
 var kColorScheme = ColorScheme.fromSeed(
   seedColor: const Color.fromARGB(255, 96, 59, 181),
   error: Colors.redAccent,

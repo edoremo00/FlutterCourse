@@ -1,3 +1,4 @@
+import 'package:expensetracker/widgets/chart/chart.dart';
 import 'package:expensetracker/widgets/expenses-list/expenses_list.dart';
 import 'package:expensetracker/models/expense.dart';
 import 'package:expensetracker/widgets/new_expense.dart';
@@ -129,10 +130,15 @@ class _ExpensesState extends State<Expenses> {
         //   )
         // ],
         title: const Text("Expense Tracker"),
+        actions: [
+          //TODO IMPLEMENT search and filters
+          //per searchbar: https://api.flutter.dev/flutter/material/SearchBar-class.html
+          IconButton(onPressed: (){}, icon: const Icon(Icons.search)),
+          IconButton( onPressed: (){},icon: const Icon(Icons.filter_list),)
+        ],
       ),
       body: Column(
         children: [
-          const Text("Chart"),
           //spacer prende quanto spazio possibile e lo divide equamente tra i due widget qua presenti
           //conditonal list per evitare di fare un expanded che wrappa colonna ecc
           if(_registeredExpenses.isEmpty)...[
@@ -143,6 +149,7 @@ class _ExpensesState extends State<Expenses> {
              CircleAvatar(child: IconButton(onPressed: _openAddExpenseOverlay, icon: const Icon(Icons.add)),),
             const Spacer()
           ]else ...[
+             Chart(expenses: _registeredExpenses),
              ExpensesList(
               expenses: _registeredExpenses, onRemoveExpense: _removeExpense,onModifyswipeDirection: _openAddExpenseOverlay,currencySymbol: currencySymbol!,),
           ]
