@@ -10,6 +10,8 @@ class ExpensesList extends StatelessWidget {
 
   ExpensesList({super.key, required this.expenses,required this.onRemoveExpense,required this.onModifyswipeDirection,required this.currencySymbol});
 
+  // ExpensesList.filtered(List<Expense> filteredExpenses,this.currencySymbol,this.onModifyswipeDirection,this.onRemoveExpense):expenses=filteredExpenses{};
+
   @override
   Widget build(BuildContext context) {
     //expanded mi serve perchè flutter non sa quanto fare grande il listview dal momento che è inserito dentro un'altra colonna che occupa tutto lo schermo

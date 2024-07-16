@@ -3,6 +3,7 @@ import 'package:expensetracker/widgets/expenses-list/expenses_list.dart';
 import 'package:expensetracker/models/expense.dart';
 import 'package:expensetracker/widgets/new_expense.dart';
 import 'package:expensetracker/widgets/global_snackbar.dart';
+import 'package:expensetracker/widgets/searchpage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -33,6 +34,7 @@ class _ExpensesState extends State<Expenses> {
     
   ];
   String? currencySymbol;
+
 
 
   @override
@@ -113,6 +115,20 @@ class _ExpensesState extends State<Expenses> {
   }
 
 
+   List<Expense> _filterExpenses(String? searchtext){
+      if(searchtext==null || searchtext.isEmpty) return _registeredExpenses;
+     return _registeredExpenses
+        .where(
+          (element) => element.title.toLowerCase().contains(
+                searchtext.toLowerCase(),
+              ),
+        )
+        .toList();
+   }
+
+    
+
+
   @override
   Widget build(BuildContext context) {
     // Widget mainContent = _registeredExpenses.isNotEmpty
@@ -133,7 +149,31 @@ class _ExpensesState extends State<Expenses> {
         actions: [
           //TODO IMPLEMENT search and filters
           //per searchbar: https://api.flutter.dev/flutter/material/SearchBar-class.html
-          IconButton(onPressed: (){}, icon: const Icon(Icons.search)),
+          // SearchAnchor(
+          //   searchController: controller,
+          //   isFullScreen: false,
+          //   viewConstraints: BoxConstraints.expand(width: double.infinity,height: 150),
+          //   viewHintText:"search expenses" ,
+          //   builder: (context, controller) => IconButton(
+          //     onPressed: () {
+          //       controller.openView();
+          //     },
+          //     icon: const Icon(Icons.search),
+          //   ),
+          //   suggestionsBuilder: (context, controller) {
+          //     return List.empty();
+          //   },
+          // ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) =>  SearchPage(onExpenseSearch: _filterExpenses,),
+                ),
+              );
+            },
+            icon: const Icon(Icons.search),
+          ),
           IconButton( onPressed: (){},icon: const Icon(Icons.filter_list),)
         ],
       ),
@@ -149,9 +189,16 @@ class _ExpensesState extends State<Expenses> {
              CircleAvatar(child: IconButton(onPressed: _openAddExpenseOverlay, icon: const Icon(Icons.add)),),
             const Spacer()
           ]else ...[
+            const SizedBox(height: 12,),
+             Text("Chart",style: Theme.of(context).textTheme.titleSmall),
              Chart(expenses: _registeredExpenses),
+             Text("My Expenses",style: Theme.of(context).textTheme.titleSmall,),
              ExpensesList(
-              expenses: _registeredExpenses, onRemoveExpense: _removeExpense,onModifyswipeDirection: _openAddExpenseOverlay,currencySymbol: currencySymbol!,),
+              expenses: _registeredExpenses,
+              onRemoveExpense: _removeExpense,
+              onModifyswipeDirection: _openAddExpenseOverlay,
+              currencySymbol: currencySymbol!,
+            ),
           ]
           
         ],

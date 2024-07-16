@@ -1,5 +1,6 @@
 import 'package:expensetracker/expenses.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 //usare k nel nome è convenzione per variabili globali
@@ -18,6 +19,7 @@ var kDarkColorScheme = ColorScheme.fromSeed(
 
 void main() {
   initializeDateFormatting();
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(
       //dark mode
@@ -29,7 +31,7 @@ void main() {
       elevation: 3.5,
       ),
       appBarTheme: const AppBarTheme().copyWith(
-          titleTextStyle: const TextStyle(
+          titleTextStyle: GoogleFonts.ubuntu(
             fontWeight: FontWeight.normal,
             fontSize: 18,
           ),
@@ -48,12 +50,19 @@ void main() {
         selectedColor: kDarkColorScheme.primaryContainer
       ),
       textTheme:ThemeData(brightness: Brightness.dark).textTheme.copyWith(
-          titleLarge: TextStyle(
-            fontWeight: FontWeight.bold,
-            color:kDarkColorScheme.onSecondaryContainer,
-            fontSize: 16
+        titleLarge: GoogleFonts.ubuntu(
+            fontWeight: FontWeight.w600,
+            color: kDarkColorScheme.onSecondaryContainer,
+            fontSize: 16, 
           ),
+          titleSmall: GoogleFonts.ubuntu(
+            fontWeight: FontWeight.bold,
+            color: kDarkColorScheme.onSecondaryContainer,
+            fontSize: 14, 
+          ),
+          
         ),
+
       
       ),
 
@@ -61,7 +70,7 @@ void main() {
       theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
         appBarTheme: const AppBarTheme().copyWith(
-          titleTextStyle: const TextStyle(
+          titleTextStyle: GoogleFonts.ubuntu(
             fontWeight: FontWeight.normal,
             fontSize: 18,
           ),
@@ -75,6 +84,10 @@ void main() {
             shadowColor: const Color.fromARGB(255, 186, 184, 184),
             elevation: 4
           ),
+          searchViewTheme: const SearchViewThemeData().copyWith(
+            backgroundColor: kColorScheme.onPrimaryContainer,
+          ),
+          
         cardTheme: const CardTheme().copyWith(
             color: kColorScheme.secondaryContainer,
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -85,11 +98,16 @@ void main() {
             ),
         ),
         textTheme:ThemeData().textTheme.copyWith(
-          titleLarge: TextStyle(
+          titleLarge: GoogleFonts.ubuntu(
             fontWeight: FontWeight.bold,
             color:kColorScheme.onSecondaryContainer,
             fontSize: 16
           ),
+          titleSmall: GoogleFonts.ubuntu(
+            fontWeight: FontWeight.w600,
+            color: kColorScheme.onSecondaryContainer,
+            fontSize: 14, 
+          )
         ),
       ),
       home: const Expenses(),
