@@ -1,5 +1,3 @@
-
-import 'package:expensetracker/models/category.dart';
 import 'package:expensetracker/models/expense.dart';
 import 'package:expensetracker/widgets/expenses-list/expenses_list.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +6,10 @@ import 'package:flutter/material.dart';
 class SearchPage extends StatefulWidget{
 
   final List<Expense> Function(String? searchText) onExpenseSearch;
-  const SearchPage({super.key,required this.onExpenseSearch});
+  final void Function({Expense? expenseToedit}) onModifyswipeDirection;
+  final void Function(Expense exp) onRemoveExpense;
+  final String currencySymbol;
+  const SearchPage({super.key,required this.onExpenseSearch,required this.currencySymbol,required this.onModifyswipeDirection,required this.onRemoveExpense});
 
   @override
   State<StatefulWidget> createState() {
@@ -24,6 +25,15 @@ class Searchpagestate extends State<SearchPage>{
   void dispose() {
     searchController.dispose();
     super.dispose();
+  }
+
+  void handleRefresh(){
+    // setState(() {
+    //   widget.onExpenseSearch(searchController.text);
+    // });
+    setState(() {
+      filteredExpenses=widget.onExpenseSearch(searchController.text);
+    });
   }
 
   final TextEditingController searchController = TextEditingController();
@@ -61,15 +71,15 @@ class Searchpagestate extends State<SearchPage>{
           )
         ],
       ),
-      // body: ExpensesList.filtered(filteredExpenses,"",""),
-      body: filteredExpenses.isNotEmpty || searchController.text.isEmpty ? ListView.separated(
-          itemBuilder: (ctx, index) => ListTile(
-                title: Text(filteredExpenses[index].title),
-                subtitle: Text(filteredExpenses[index].amount.toString()),
-                trailing: Icon(categoryIcons[filteredExpenses[index].category]),
-              ),
-          separatorBuilder: (ctx, index) => const Divider(),
-          itemCount: filteredExpenses.length) : const Padding(padding: EdgeInsets.symmetric(vertical: 8,horizontal: 16),child: Text("No expense found"),),
+      body: filteredExpenses.isNotEmpty || searchController.text.isEmpty ?
+         Column(children: [
+           ExpensesList.filtered(filteredExpenses, widget.currencySymbol, widget.onModifyswipeDirection, widget.onRemoveExpense,handleRefresh)
+         ],)
+        
+          : const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              child: Text("No expense found"),
+            ),
     );
   }
     
