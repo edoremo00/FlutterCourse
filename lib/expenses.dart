@@ -168,7 +168,12 @@ class _ExpensesState extends State<Expenses> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) =>  SearchPage(onExpenseSearch: _filterExpenses,),
+                  builder: (BuildContext context) => SearchPage(
+                    onExpenseSearch: _filterExpenses,
+                    currencySymbol: currencySymbol!,
+                    onModifyswipeDirection: _openAddExpenseOverlay,
+                    onRemoveExpense: _removeExpense,
+                  ),
                 ),
               );
             },
