@@ -6,11 +6,13 @@ class ExpensesList extends StatelessWidget {
   final List<Expense> expenses;
   final void Function(Expense exp) onRemoveExpense;
   final void Function({Expense? expenseToedit}) onModifyswipeDirection;
+  void Function()? handleSearchRefresh;
   String currencySymbol;
 
   ExpensesList({super.key, required this.expenses,required this.onRemoveExpense,required this.onModifyswipeDirection,required this.currencySymbol});
 
-  // ExpensesList.filtered(List<Expense> filteredExpenses,this.currencySymbol,this.onModifyswipeDirection,this.onRemoveExpense):expenses=filteredExpenses{};
+ //costruttore usato per mostrare risultati ricerca
+  ExpensesList.filtered(List<Expense> filteredExpenses,this.currencySymbol,this.onModifyswipeDirection,this.onRemoveExpense,this.handleSearchRefresh, {super.key}):expenses=filteredExpenses;
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +28,23 @@ class ExpensesList extends StatelessWidget {
               dismissThresholds: const {DismissDirection.startToEnd:0.1,DismissDirection.endToStart:0.1},
               onDismissed: (direction) {
                 onRemoveExpense(expenses[index]);
+
+                //sarà null in pagina principale e non in pagina ricerca
+                if(handleSearchRefresh !=null){
+                 handleSearchRefresh!();
+                }
+
               },
               confirmDismiss: (direction) async{
                 //modify
                 if(direction==DismissDirection.endToStart){
                   //open modal to edit
                   onModifyswipeDirection(expenseToedit:expenses[index]);
+                  
+                  //TODO FIX editing in order to display updated info also in the searchpage
+                  // if(handleSearchRefresh !=null){
+                  //   handleSearchRefresh!();
+                  // }
                   return false;
                   
                 }
