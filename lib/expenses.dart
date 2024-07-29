@@ -116,7 +116,7 @@ class _ExpensesState extends State<Expenses> {
 
 
    List<Expense> _filterExpenses(String? searchtext){
-      if(searchtext==null || searchtext.isEmpty) return _registeredExpenses;
+      if(searchtext==null || searchtext.isEmpty) return List.empty();
      return _registeredExpenses
         .where(
           (element) => element.title.toLowerCase().contains(

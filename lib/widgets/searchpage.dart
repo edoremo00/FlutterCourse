@@ -62,7 +62,7 @@ class Searchpagestate extends State<SearchPage>{
         ],
       ),
       // body: ExpensesList.filtered(filteredExpenses,"",""),
-      body: filteredExpenses.isNotEmpty ? ListView.separated(
+      body: filteredExpenses.isNotEmpty || searchController.text.isEmpty ? ListView.separated(
           itemBuilder: (ctx, index) => ListTile(
                 title: Text(filteredExpenses[index].title),
                 subtitle: Text(filteredExpenses[index].amount.toString()),
