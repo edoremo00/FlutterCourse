@@ -1,3 +1,4 @@
+import 'package:expensetracker/models/sorting.dart';
 import 'package:expensetracker/widgets/chart/chart.dart';
 import 'package:expensetracker/widgets/expenses-list/expenses_list.dart';
 import 'package:expensetracker/models/expense.dart';
@@ -5,10 +6,13 @@ import 'package:expensetracker/widgets/new_expense.dart';
 import 'package:expensetracker/widgets/global_snackbar.dart';
 import 'package:expensetracker/widgets/searchpage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import 'models/category.dart';
 
+
+enum SortDirection {up,down}
 class Expenses extends StatefulWidget {
   const Expenses({super.key});
   @override
@@ -34,6 +38,8 @@ class _ExpensesState extends State<Expenses> {
     
   ];
   String? currencySymbol;
+  String defaultSortdir=SortDirection.down.name;
+  
 
 
 
@@ -53,17 +59,18 @@ class _ExpensesState extends State<Expenses> {
     }
   }
 
-  void _openAddExpenseOverlay({Expense? expenseToedit}){
+  void _openAddExpenseOverlay({Expense? expenseToedit, void Function()? handleSearchRefresh}){
 
     //context è resa disponibile da flutter in automatico dato che siamo in una classe che estende state
     //eg statefulwidget
     //context--> metadati ogni widget ha il suo. contiene info sul widget e su sua posizione in widget tree
     //builder è una funzione che ritorna un widget
+    //funzione handlesearchrefresh ha valore non null nel caso di modifica da pagine della ricerca ed eseguita per aver i dati aggiornati
    showModalBottomSheet(
       isScrollControlled: true,
       isDismissible: false,
       context: context,
-      builder: (ctx) => NewExpense(onAddExpense: _addExpense,onModifyExpense: _modifyExpense,existingExpense: expenseToedit,currencySymbol: currencySymbol,),
+      builder: (ctx) => NewExpense(onAddExpense: _addExpense,onModifyExpense: _modifyExpense,existingExpense: expenseToedit,currencySymbol: currencySymbol,onHandleSearchRefresh: handleSearchRefresh,),
     );
   }
 
@@ -73,7 +80,7 @@ class _ExpensesState extends State<Expenses> {
     });
   }
 
-  void _removeExpense(Expense exp){
+  void _removeExpense(Expense exp,{ void Function()? handleSearchRefresh}){
     final expenseIndex= _registeredExpenses.indexOf(exp);
     setState(() {
       _registeredExpenses.remove(exp);
@@ -87,12 +94,23 @@ class _ExpensesState extends State<Expenses> {
         contentText: "Expense Deleted",
         action: SnackBarAction(
           label: "Undo",
-          onPressed: () => setState(() {
+          onPressed: () {
+          // Undo the expense removal
+          setState(() {
             _registeredExpenses.insert(expenseIndex, exp);
-          }),
+          });
+          // Call the refresh callback after undo
+          if (handleSearchRefresh != null) {
+            handleSearchRefresh();
+          }
+        },
         ),
       ),
     );
+    //call refresh after the delete if we are in the searchpage
+    if(handleSearchRefresh!=null){
+      handleSearchRefresh();
+    }
   }
 
   
@@ -125,6 +143,101 @@ class _ExpensesState extends State<Expenses> {
         )
         .toList();
    }
+
+    void _openFilterExpenseOverlay(){
+
+    //context è resa disponibile da flutter in automatico dato che siamo in una classe che estende state
+    //eg statefulwidget
+    //context--> metadati ogni widget ha il suo. contiene info sul widget e su sua posizione in widget tree
+    //builder è una funzione che ritorna un widget
+    //funzione handlesearchrefresh ha valore non null nel caso di modifica da pagine della ricerca ed eseguita per aver i dati aggiornati
+   showModalBottomSheet(
+      isScrollControlled: true,
+      isDismissible: true,
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text("Categories",style: Theme.of(context).textTheme.titleSmall),
+            SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              clipBehavior: Clip.hardEdge,
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 12,
+                children: [
+                  ...categoryIcons.entries.map((entry) {
+                    return ChoiceChip(
+                      showCheckmark: false,
+                      selected: true, //_selectedCategory==entry.key,
+                      onSelected: (_) {
+                        // setState(() {
+                        //   _selectedCategory=entry.key;
+                        // });
+                      },
+                      padding: const EdgeInsets.all(6),
+                      labelPadding: const EdgeInsets.all(6),
+                      avatar: CircleAvatar(
+                        child: Icon(entry.value),
+                      ),
+                      label: Text(
+                        entry.key.name.toUpperCase(),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Order by",style: Theme.of(context).textTheme.titleSmall),
+                IconButton(onPressed: (){
+                  //TODO FIX ICON SORTING THIS WILL BE FIXED ONCE I MOVE THIS CODE IN A SEPARATE STATEFUL WIDGET
+                  setState(() {
+                   defaultSortdir=defaultSortdir==SortDirection.up.name ? SortDirection.down.name : SortDirection.up.name;
+                  });
+                }, icon: defaultSortdir==SortDirection.up.name ? Icon(Icons.arrow_upward): Icon(Icons.arrow_downward),),
+              ],
+            ),
+             SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              clipBehavior: Clip.hardEdge,
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 12,
+                children: [
+                  ...sortingIcons.entries.map((entry) {
+                    return ChoiceChip(
+                      showCheckmark: false,
+                      selected: true, //_selectedCategory==entry.key,
+                      onSelected: (_) {
+                        // setState(() {
+                        //   _selectedCategory=entry.key;
+                        // });
+                      },
+                      padding: const EdgeInsets.all(6),
+                      labelPadding: const EdgeInsets.all(6),
+                      avatar: CircleAvatar(
+                        child: Icon(entry.value),
+                      ),
+                      label: Text(
+                        entry.key.name.toUpperCase(),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+            
+          ],
+        ),
+      ),
+    );
+  }
 
     
 
@@ -179,7 +292,7 @@ class _ExpensesState extends State<Expenses> {
             },
             icon: const Icon(Icons.search),
           ),
-          IconButton( onPressed: (){},icon: const Icon(Icons.filter_list),)
+          IconButton( onPressed: _openFilterExpenseOverlay,icon: const Icon(Icons.filter_list),)
         ],
       ),
       body: Column(

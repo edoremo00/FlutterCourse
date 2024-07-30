@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 class SearchPage extends StatefulWidget{
 
   final List<Expense> Function(String? searchText) onExpenseSearch;
-  final void Function({Expense? expenseToedit}) onModifyswipeDirection;
-  final void Function(Expense exp) onRemoveExpense;
+  final void Function({Expense? expenseToedit,void Function()? handleSearchRefresh}) onModifyswipeDirection;
+  final void Function(Expense exp,{ void Function()? handleSearchRefresh}) onRemoveExpense;
   final String currencySymbol;
   const SearchPage({super.key,required this.onExpenseSearch,required this.currencySymbol,required this.onModifyswipeDirection,required this.onRemoveExpense});
 
@@ -50,6 +50,7 @@ class Searchpagestate extends State<SearchPage>{
               children: [
                 SizedBox(
                   child: TextField(
+                    autofocus: true,
                     controller: searchController,
                     onChanged: (value){
                       setState(() {
@@ -65,10 +66,23 @@ class Searchpagestate extends State<SearchPage>{
                     ),
                     
                   ),
-                )
+                ),
+                
               ],
             ),
-          )
+          ),
+          if (searchController.text.isNotEmpty) ...[
+            SizedBox(
+              width: 50,
+              child: IconButton(
+                onPressed: () {
+                  searchController.clear();
+                  handleRefresh();
+                },
+                icon: const Icon(Icons.close),
+              ),
+            ),
+          ]
         ],
       ),
       body: filteredExpenses.isNotEmpty || searchController.text.isEmpty ?

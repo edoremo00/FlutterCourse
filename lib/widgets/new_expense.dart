@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 class NewExpense extends StatefulWidget {
   final void Function(Expense newxp) onAddExpense;
   final void Function(Expense modexp) onModifyExpense;
+  void Function()? onHandleSearchRefresh;
   Expense? existingExpense;
   String? currencySymbol;
-  NewExpense({super.key,required this.onAddExpense,required this.onModifyExpense,required this.currencySymbol,this.existingExpense});
+  NewExpense({super.key,required this.onAddExpense,required this.onModifyExpense,required this.currencySymbol,this.existingExpense,this.onHandleSearchRefresh});
   @override
   State<StatefulWidget> createState() {
     return _NewExpenseState();
@@ -136,6 +137,11 @@ class _NewExpenseState extends State<NewExpense> {
         widget.existingExpense!.category=_selectedCategory!;
         widget.existingExpense!.date=enteredDate;
         widget.onModifyExpense(widget.existingExpense!);
+
+       if(widget.onHandleSearchRefresh!=null){
+        //we are in the searchpage and the user has edited the information. refresh the search to show update data
+        widget.onHandleSearchRefresh!();
+       } 
         
     }else{
       Expense newexp = Expense(

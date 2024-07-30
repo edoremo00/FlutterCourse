@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 class ExpensesList extends StatelessWidget {
   final List<Expense> expenses;
-  final void Function(Expense exp) onRemoveExpense;
-  final void Function({Expense? expenseToedit}) onModifyswipeDirection;
   void Function()? handleSearchRefresh;
+  final void Function(Expense exp, {void Function()? handleSearchRefresh}) onRemoveExpense;
+  final void Function({Expense? expenseToedit,void Function()? handleSearchRefresh}) onModifyswipeDirection;
   String currencySymbol;
 
   ExpensesList({super.key, required this.expenses,required this.onRemoveExpense,required this.onModifyswipeDirection,required this.currencySymbol});
@@ -27,24 +27,15 @@ class ExpensesList extends StatelessWidget {
             return Dismissible(
               dismissThresholds: const {DismissDirection.startToEnd:0.1,DismissDirection.endToStart:0.1},
               onDismissed: (direction) {
-                onRemoveExpense(expenses[index]);
-
-                //sarà null in pagina principale e non in pagina ricerca
-                if(handleSearchRefresh !=null){
-                 handleSearchRefresh!();
-                }
+                onRemoveExpense(expenses[index],handleSearchRefresh:handleSearchRefresh);
 
               },
               confirmDismiss: (direction) async{
                 //modify
                 if(direction==DismissDirection.endToStart){
                   //open modal to edit
-                  onModifyswipeDirection(expenseToedit:expenses[index]);
-                  
-                  //TODO FIX editing in order to display updated info also in the searchpage
-                  // if(handleSearchRefresh !=null){
-                  //   handleSearchRefresh!();
-                  // }
+                  //display updated info also in the searchpage (if we are in that page) in this case handesearchpage function is not null
+                  onModifyswipeDirection(expenseToedit:expenses[index],handleSearchRefresh:handleSearchRefresh);
                   return false;
                   
                 }
