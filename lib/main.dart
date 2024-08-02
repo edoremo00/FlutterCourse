@@ -60,6 +60,11 @@ void main() {
             color: kDarkColorScheme.onSecondaryContainer,
             fontSize: 14, 
           ),
+          bodySmall: GoogleFonts.ubuntu(
+            fontWeight: FontWeight.w600,
+            color: kDarkColorScheme.onSecondaryContainer,
+            fontSize: 14, 
+          )
           
         ),
 
@@ -107,7 +112,12 @@ void main() {
             fontWeight: FontWeight.w600,
             color: kColorScheme.onSecondaryContainer,
             fontSize: 14, 
-          )
+          ),
+          bodySmall: GoogleFonts.ubuntu(
+            fontWeight: FontWeight.w600,
+            color: kDarkColorScheme.onSecondaryContainer,
+            fontSize: 14, 
+          ),
         ),
       ),
       home: const Expenses(),
