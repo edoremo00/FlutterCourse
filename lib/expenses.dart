@@ -2,6 +2,7 @@ import 'package:expensetracker/models/sorting.dart';
 import 'package:expensetracker/widgets/chart/chart.dart';
 import 'package:expensetracker/widgets/expenses-list/expenses_list.dart';
 import 'package:expensetracker/models/expense.dart';
+import 'package:expensetracker/widgets/filters.dart';
 import 'package:expensetracker/widgets/new_expense.dart';
 import 'package:expensetracker/widgets/global_snackbar.dart';
 import 'package:expensetracker/widgets/searchpage.dart';
@@ -155,87 +156,7 @@ class _ExpensesState extends State<Expenses> {
       isScrollControlled: true,
       isDismissible: true,
       context: context,
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text("Categories",style: Theme.of(context).textTheme.titleSmall),
-            SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              clipBehavior: Clip.hardEdge,
-              child: Wrap(
-                spacing: 16,
-                runSpacing: 12,
-                children: [
-                  ...categoryIcons.entries.map((entry) {
-                    return ChoiceChip(
-                      showCheckmark: false,
-                      selected: true, //_selectedCategory==entry.key,
-                      onSelected: (_) {
-                        // setState(() {
-                        //   _selectedCategory=entry.key;
-                        // });
-                      },
-                      padding: const EdgeInsets.all(6),
-                      labelPadding: const EdgeInsets.all(6),
-                      avatar: CircleAvatar(
-                        child: Icon(entry.value),
-                      ),
-                      label: Text(
-                        entry.key.name.toUpperCase(),
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Order by",style: Theme.of(context).textTheme.titleSmall),
-                IconButton(onPressed: (){
-                  //TODO FIX ICON SORTING THIS WILL BE FIXED ONCE I MOVE THIS CODE IN A SEPARATE STATEFUL WIDGET
-                  setState(() {
-                   defaultSortdir=defaultSortdir==SortDirection.up.name ? SortDirection.down.name : SortDirection.up.name;
-                  });
-                }, icon: defaultSortdir==SortDirection.up.name ? Icon(Icons.arrow_upward): Icon(Icons.arrow_downward),),
-              ],
-            ),
-             SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              clipBehavior: Clip.hardEdge,
-              child: Wrap(
-                spacing: 16,
-                runSpacing: 12,
-                children: [
-                  ...sortingIcons.entries.map((entry) {
-                    return ChoiceChip(
-                      showCheckmark: false,
-                      selected: true, //_selectedCategory==entry.key,
-                      onSelected: (_) {
-                        // setState(() {
-                        //   _selectedCategory=entry.key;
-                        // });
-                      },
-                      padding: const EdgeInsets.all(6),
-                      labelPadding: const EdgeInsets.all(6),
-                      avatar: CircleAvatar(
-                        child: Icon(entry.value),
-                      ),
-                      label: Text(
-                        entry.key.name.toUpperCase(),
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
-            
-          ],
-        ),
-      ),
+      builder: (ctx) => FiltersWidget()
     );
   }
 

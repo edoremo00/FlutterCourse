@@ -261,7 +261,7 @@ class _NewExpenseState extends State<NewExpense> {
               ),
               const SizedBox(height: 32),
               SingleChildScrollView(scrollDirection: Axis.horizontal,clipBehavior: Clip.hardEdge,child: Wrap(
-                spacing: 16,
+                spacing: 12,
                 children: [
                   ...categoryIcons.entries.map(
                     (entry) {
@@ -273,10 +273,12 @@ class _NewExpenseState extends State<NewExpense> {
                           _selectedCategory=entry.key;
                         });
                       },
-                      padding: const EdgeInsets.all(6),
-                      labelPadding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(4),
+                      labelPadding: const EdgeInsets.symmetric(horizontal: 6,vertical: 9),
+                      // padding: const EdgeInsets.all(6),
+                      // labelPadding: const EdgeInsets.all(6),
                       avatar: CircleAvatar(child: Icon(entry.value),),
-                      label: Text(entry.key.name.toUpperCase(),),
+                      label: Text(entry.key.name,style: Theme.of(context).textTheme.bodySmall,),
                     );} 
                     
                   ),
@@ -315,15 +317,4 @@ class _NewExpenseState extends State<NewExpense> {
     );
   }
 
-  // void setBottompadding(){
-  //   var currentBottompadding=MediaQuery.of(context).viewInsets.bottom;
-  //   Function shouldBottompaddingChange=(double padding){
-  //     double result=(currentBottompadding>padding && currentBottompadding !=0.0) ? currentBottompadding : padding;
-  //     previousPadding=result;
-  //     if(result==padding) return currentBottompadding;
-  //     return result;
-  //   };
-  //   previousPadding=shouldBottompaddingChange(previousPadding);
-
-  // }
 }
