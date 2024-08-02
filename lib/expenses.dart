@@ -156,7 +156,7 @@ class _ExpensesState extends State<Expenses> {
       isScrollControlled: true,
       isDismissible: true,
       context: context,
-      builder: (ctx) => FiltersWidget()
+      builder: (ctx) => const FiltersWidget()
     );
   }
 
