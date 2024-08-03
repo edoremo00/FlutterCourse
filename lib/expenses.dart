@@ -1,3 +1,4 @@
+import 'package:expensetracker/models/filter.dart';
 import 'package:expensetracker/models/sorting.dart';
 import 'package:expensetracker/widgets/chart/chart.dart';
 import 'package:expensetracker/widgets/expenses-list/expenses_list.dart';
@@ -145,6 +146,40 @@ class _ExpensesState extends State<Expenses> {
         .toList();
    }
 
+   List<Expense> _filterandSort(Filter? filterObj){
+      if(filterObj?.category==null && filterObj?.sorting==null) return _registeredExpenses;
+      bool matches=true;
+      var result= _registeredExpenses.where((element){
+         if(filterObj?.category!=null){
+          matches=matches && filterObj?.category==element.category;
+         }
+         return matches;
+      }).toList();
+      if(result.isEmpty) return List.empty();
+      if(filterObj?.sorting!=null && filterObj?.sortDirection!=null){
+        result.sort((a,b){
+          int comparison;
+        switch (filterObj?.sorting){
+          case Sorting.date:
+            comparison=a.date.compareTo(b.date);
+            break;
+          case Sorting.price:
+            comparison=a.amount.compareTo(b.amount);
+            break;
+          case Sorting.expensename:
+            comparison=a.title.compareTo(b.title);
+            break;
+          default:
+            comparison=0;
+          
+        }
+        return filterObj?.sortDirection==SortDirection.up ? comparison : -comparison;
+        });
+        
+      }
+      return result;
+   }
+
     void _openFilterExpenseOverlay(){
 
     //context è resa disponibile da flutter in automatico dato che siamo in una classe che estende state
@@ -156,7 +191,7 @@ class _ExpensesState extends State<Expenses> {
       isScrollControlled: true,
       isDismissible: true,
       context: context,
-      builder: (ctx) => const FiltersWidget()
+      builder: (ctx) => FiltersWidget(onFilterandSort: _filterandSort,)
     );
   }
 

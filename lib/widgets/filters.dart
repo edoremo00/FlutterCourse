@@ -1,10 +1,13 @@
 import 'package:expensetracker/expenses.dart';
 import 'package:expensetracker/models/category.dart';
+import 'package:expensetracker/models/expense.dart';
+import 'package:expensetracker/models/filter.dart';
 import 'package:expensetracker/models/sorting.dart';
 import 'package:flutter/material.dart';
 
 class FiltersWidget extends StatefulWidget {
-  const FiltersWidget({super.key});
+  final List<Expense> Function (Filter? filterObj) onFilterandSort;
+  const FiltersWidget({super.key,required this.onFilterandSort});
 
   @override
   State<StatefulWidget> createState() {
@@ -27,7 +30,9 @@ class FiltersWidgetstate extends State<FiltersWidget> {
           child: Row(
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context);
+                },
                 icon: const Icon(Icons.close),
               ),
               const Spacer(),
@@ -35,7 +40,18 @@ class FiltersWidgetstate extends State<FiltersWidget> {
                   style: Theme.of(context).textTheme.titleLarge),
               const Spacer(),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context);
+                  widget.onFilterandSort(
+                    Filter(
+                      category: _selectedCategory,
+                      sorting: _selectedSorting,
+                      sortDirection: _selectedSorting != null
+                          ? SortDirection.values.byName(defaultSortdir)
+                          : null,
+                    ),
+                  );
+                },
                 icon: const Icon(Icons.check),
               ),
             ],
