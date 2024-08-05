@@ -73,24 +73,52 @@ class FiltersWidgetstate extends State<FiltersWidget> {
               runSpacing: 9,
               children: [
                 ...categoryIcons.entries.map((entry) {
-                  return ChoiceChip(
+                  // return ChoiceChip(
+                  //   showCheckmark: false,
+                  //   selected: _selectedCategory == entry.key,
+                  //   onSelected: (_) {
+                  //     setState(() {
+                  //       _selectedCategory = entry.key;
+                  //     });
+                  //   },
+                  //   padding: const EdgeInsets.all(4),
+                  //   labelPadding:
+                  //       const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                  //   avatar: CircleAvatar(
+                  //     child: Icon(entry.value),
+                  //   ),
+                  //   label: Text(
+                  //     style: Theme.of(context).textTheme.bodySmall,
+                  //     entry.key.name,
+                  //   ),
+                  // );
+                  return FilterChip(
+                    label: Badge(
+                      label: Text("1"),
+                     
+                     alignment: Alignment.topRight,
+                      child: Text(
+                        style: Theme.of(context).textTheme.bodySmall,
+                        entry.key.name,
+                      ),
+                    ),
+
+                    //TODO DA FINIRE
+                    // label: Row(
+                    //   children: [
+                        
+                    //   ],
+                    // ),
+                    onSelected: (value) {},
+                    selected: true,
+                    onDeleted: () {},
                     showCheckmark: false,
-                    selected: _selectedCategory == entry.key,
-                    onSelected: (_) {
-                      setState(() {
-                        _selectedCategory = entry.key;
-                      });
-                    },
-                    padding: const EdgeInsets.all(4),
-                    labelPadding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
                     avatar: CircleAvatar(
                       child: Icon(entry.value),
                     ),
-                    label: Text(
-                      style: Theme.of(context).textTheme.bodySmall,
-                      entry.key.name,
-                    ),
+                    padding: const EdgeInsets.all(4),
+                    labelPadding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   );
                 }),
               ],
