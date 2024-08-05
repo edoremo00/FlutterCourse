@@ -7,6 +7,7 @@ import 'package:expensetracker/widgets/filters.dart';
 import 'package:expensetracker/widgets/new_expense.dart';
 import 'package:expensetracker/widgets/global_snackbar.dart';
 import 'package:expensetracker/widgets/searchpage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -41,10 +42,18 @@ class _ExpensesState extends State<Expenses> {
   ];
   String? currencySymbol;
   String defaultSortdir=SortDirection.down.name;
+  List<Expense>? _filteredExpenses;
+  bool isFilteredView=false;
   
 
 
 
+
+ @override
+ void initState() {
+    super.initState();
+    _filteredExpenses=[..._registeredExpenses];
+  }
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -79,6 +88,7 @@ class _ExpensesState extends State<Expenses> {
   void _addExpense(Expense newexp){
     setState(() {
       _registeredExpenses.add(newexp);
+      _filteredExpenses?.add(newexp);
     });
   }
 
@@ -86,6 +96,7 @@ class _ExpensesState extends State<Expenses> {
     final expenseIndex= _registeredExpenses.indexOf(exp);
     setState(() {
       _registeredExpenses.remove(exp);
+      _filteredExpenses?.remove(exp);
     });
     GlobalSnackBar.clearSnackBars(context);
     GlobalSnackBar.show(
@@ -100,6 +111,7 @@ class _ExpensesState extends State<Expenses> {
           // Undo the expense removal
           setState(() {
             _registeredExpenses.insert(expenseIndex, exp);
+            _filteredExpenses?.insert(expenseIndex, exp);
           });
           // Call the refresh callback after undo
           if (handleSearchRefresh != null) {
@@ -121,6 +133,7 @@ class _ExpensesState extends State<Expenses> {
    if(editedExpenseIndex>-1){
      setState(() {
       _registeredExpenses[editedExpenseIndex]=edited;
+       _filteredExpenses?[editedExpenseIndex]=edited;
      });
     GlobalSnackBar.clearSnackBars(context);
     GlobalSnackBar.show(
@@ -149,13 +162,19 @@ class _ExpensesState extends State<Expenses> {
    List<Expense> _filterandSort(Filter? filterObj){
       if(filterObj?.category==null && filterObj?.sorting==null) return _registeredExpenses;
       bool matches=true;
-      var result= _registeredExpenses.where((element){
+      var result= _filteredExpenses?.where((element){
          if(filterObj?.category!=null){
           matches=matches && filterObj?.category==element.category;
          }
          return matches;
       }).toList();
-      if(result.isEmpty) return List.empty();
+      if(result!.isEmpty){
+        setState(() {
+          _filteredExpenses=result;
+          isFilteredView=true;
+        });
+        return List.empty();
+      } 
       if(filterObj?.sorting!=null && filterObj?.sortDirection!=null){
         result.sort((a,b){
           int comparison;
@@ -177,6 +196,10 @@ class _ExpensesState extends State<Expenses> {
         });
         
       }
+      setState(() {
+        _filteredExpenses=result;
+        isFilteredView=true;
+      });
       return result;
    }
 
@@ -235,6 +258,9 @@ class _ExpensesState extends State<Expenses> {
           // ),
           IconButton(
             onPressed: () {
+              // setState(() {
+              //   isFilteredView=false;
+              // });
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (BuildContext context) => SearchPage(
@@ -248,7 +274,18 @@ class _ExpensesState extends State<Expenses> {
             },
             icon: const Icon(Icons.search),
           ),
-          IconButton( onPressed: _openFilterExpenseOverlay,icon: const Icon(Icons.filter_list),)
+          GestureDetector(
+            onTap: _openFilterExpenseOverlay,
+            child: Badge(
+              label: Text("1"),
+              offset: const Offset(-5, 10),
+              alignment: Alignment.topRight,
+              child: IconButton(
+                onPressed: _openFilterExpenseOverlay,
+                icon: const Icon(Icons.filter_list),
+              ),
+            ),
+          ),
         ],
       ),
       body: Column(
@@ -262,13 +299,17 @@ class _ExpensesState extends State<Expenses> {
             ),
              CircleAvatar(child: IconButton(onPressed: _openAddExpenseOverlay, icon: const Icon(Icons.add)),),
             const Spacer()
+          ]else if(isFilteredView && _filteredExpenses!.isEmpty)...[
+               Center(child: Text("No result found for this filters"),)
           ]else ...[
             const SizedBox(height: 12,),
-             Text("Chart",style: Theme.of(context).textTheme.titleSmall),
+            if(!isFilteredView)...[
+               Text("Chart",style: Theme.of(context).textTheme.titleSmall),
              Chart(expenses: _registeredExpenses),
+            ],
              Text("My Expenses",style: Theme.of(context).textTheme.titleSmall,),
              ExpensesList(
-              expenses: _registeredExpenses,
+              expenses: isFilteredView ?   _filteredExpenses! : _registeredExpenses,
               onRemoveExpense: _removeExpense,
               onModifyswipeDirection: _openAddExpenseOverlay,
               currencySymbol: currencySymbol!,
