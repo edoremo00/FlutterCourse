@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 
 class FiltersWidget extends StatefulWidget {
   final List<Expense> Function (Filter? filterObj) onFilterandSort;
-  const FiltersWidget({super.key,required this.onFilterandSort});
+  Filter? lastAppliedfilterObj;
+  FiltersWidget({super.key,required this.onFilterandSort,this.lastAppliedfilterObj});
 
   @override
   State<StatefulWidget> createState() {
@@ -17,7 +18,7 @@ class FiltersWidget extends StatefulWidget {
 
 class FiltersWidgetstate extends State<FiltersWidget> {
   String defaultSortdir = SortDirection.up.name;
-  Category? _selectedCategory;
+  List<Category> _selectedCategories=[];
   Sorting? _selectedSorting;
   @override
   Widget build(BuildContext context) {
@@ -44,11 +45,11 @@ class FiltersWidgetstate extends State<FiltersWidget> {
                   Navigator.pop(context);
                   widget.onFilterandSort(
                     Filter(
-                      category: _selectedCategory,
-                      sorting: _selectedSorting,
+                      categories: _selectedCategories.isEmpty ? (widget.lastAppliedfilterObj?.categories) : _selectedCategories,
+                      sorting: _selectedSorting ?? widget.lastAppliedfilterObj?.sorting,
                       sortDirection: _selectedSorting != null
                           ? SortDirection.values.byName(defaultSortdir)
-                          : null,
+                          : widget.lastAppliedfilterObj?.sortDirection,
                     ),
                   );
                 },
@@ -93,25 +94,41 @@ class FiltersWidgetstate extends State<FiltersWidget> {
                   //   ),
                   // );
                   return FilterChip(
-                    label: Badge(
-                      label: Text("1"),
-                     
-                     alignment: Alignment.topRight,
-                      child: Text(
-                        style: Theme.of(context).textTheme.bodySmall,
-                        entry.key.name,
-                      ),
+                    label: Text(
+                      style: Theme.of(context).textTheme.bodySmall,
+                      entry.key.name,
                     ),
-
-                    //TODO DA FINIRE
-                    // label: Row(
-                    //   children: [
-                        
-                    //   ],
-                    // ),
-                    onSelected: (value) {},
-                    selected: true,
-                    onDeleted: () {},
+                    onSelected: (_) {
+                      if(!_selectedCategories.contains(entry.key)){
+                        setState(() {
+                          _selectedCategories.add(entry.key);
+                        });
+                      }
+                      if(widget.lastAppliedfilterObj?.categories!=null){
+                        final categories=widget.lastAppliedfilterObj!.categories!;
+                        if(categories.isNotEmpty){
+                          List<Category> temp=[];
+                          for(var category in categories){
+                            if(_selectedCategories.contains(category)){
+                              continue;
+                            }else{
+                              temp.add(category);
+                            }
+                          }
+                          setState(() {
+                            _selectedCategories.addAll(temp);
+                          });
+                        }
+                      }
+                      
+                    },
+                    selected: _selectedCategories.contains(entry.key) || (widget.lastAppliedfilterObj?.categories?.contains(entry.key) ?? false),
+                    onDeleted: () {
+                      setState(() {
+                        _selectedCategories.remove(entry.key);
+                        widget.lastAppliedfilterObj?.categories?.remove(entry.key);
+                      });
+                    },
                     showCheckmark: false,
                     avatar: CircleAvatar(
                       child: Icon(entry.value),
@@ -137,7 +154,7 @@ class FiltersWidgetstate extends State<FiltersWidget> {
             children: [
               Text("Order by", style: Theme.of(context).textTheme.titleSmall),
               Opacity(
-                opacity: _selectedSorting != null ? 1 : 0,
+                opacity: _selectedSorting != null || widget.lastAppliedfilterObj?.sorting!=null ? 1 : 0,
                 child: IconButton(
                   onPressed: () {
                     setState(() {
@@ -146,6 +163,7 @@ class FiltersWidgetstate extends State<FiltersWidget> {
                           : SortDirection.up.name;
                     });
                   },
+                  // icon:  widget.lastAppliedfilterObj?.sortDirection !=null ?  Icon(widget.lastAppliedfilterObj?.sortDirection ==SortDirection.up ? Icons.arrow_upward : Icons.arrow_downward) : 
                   icon: defaultSortdir == SortDirection.up.name
                       ? const Icon(Icons.arrow_upward)
                       : const Icon(Icons.arrow_downward),
@@ -167,7 +185,7 @@ class FiltersWidgetstate extends State<FiltersWidget> {
                 ...sortingIcons.entries.map((entry) {
                   return ChoiceChip(
                     showCheckmark: false,
-                    selected: _selectedSorting == entry.key,
+                    selected: _selectedSorting == entry.key || widget.lastAppliedfilterObj?.sorting==entry.key,
                     onSelected: (_) {
                       setState(() {
                         _selectedSorting = entry.key;
