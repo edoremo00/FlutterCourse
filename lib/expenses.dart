@@ -7,15 +7,13 @@ import 'package:expensetracker/widgets/filters.dart';
 import 'package:expensetracker/widgets/new_expense.dart';
 import 'package:expensetracker/widgets/global_snackbar.dart';
 import 'package:expensetracker/widgets/searchpage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import 'models/category.dart';
 
+enum SortDirection { up, down }
 
-enum SortDirection {up,down}
 class Expenses extends StatefulWidget {
   const Expenses({super.key});
   @override
@@ -38,29 +36,29 @@ class _ExpensesState extends State<Expenses> {
       expdate: DateTime.now(),
       category: Category.leisure,
     ),
-    
   ];
   String? currencySymbol;
-  String defaultSortdir=SortDirection.down.name;
+  String defaultSortdir = SortDirection.down.name;
   List<Expense>? _filteredExpenses;
-  bool isFilteredView=false;
+  bool isFilteredView = false;
+  int? appliedFilterNum;
+  Filter? lastfilterObj;
+
   
 
-
-
-
- @override
- void initState() {
+  @override
+  void initState() {
     super.initState();
-    _filteredExpenses=[..._registeredExpenses];
+    _filteredExpenses = [..._registeredExpenses];
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     retrieveCurrencySymbol();
   }
 
-    void retrieveCurrencySymbol() {
+  void retrieveCurrencySymbol() {
     final locale = View.of(context).platformDispatcher.locale.toLanguageTag();
     final formatted = NumberFormat.simpleCurrency(locale: locale);
     if (formatted.currencySymbol != currencySymbol) {
@@ -70,30 +68,36 @@ class _ExpensesState extends State<Expenses> {
     }
   }
 
-  void _openAddExpenseOverlay({Expense? expenseToedit, void Function()? handleSearchRefresh}){
-
+  void _openAddExpenseOverlay(
+      {Expense? expenseToedit, void Function()? handleSearchRefresh}) {
     //context è resa disponibile da flutter in automatico dato che siamo in una classe che estende state
     //eg statefulwidget
     //context--> metadati ogni widget ha il suo. contiene info sul widget e su sua posizione in widget tree
     //builder è una funzione che ritorna un widget
     //funzione handlesearchrefresh ha valore non null nel caso di modifica da pagine della ricerca ed eseguita per aver i dati aggiornati
-   showModalBottomSheet(
+    showModalBottomSheet(
       isScrollControlled: true,
       isDismissible: false,
       context: context,
-      builder: (ctx) => NewExpense(onAddExpense: _addExpense,onModifyExpense: _modifyExpense,existingExpense: expenseToedit,currencySymbol: currencySymbol,onHandleSearchRefresh: handleSearchRefresh,),
+      builder: (ctx) => NewExpense(
+        onAddExpense: _addExpense,
+        onModifyExpense: _modifyExpense,
+        existingExpense: expenseToedit,
+        currencySymbol: currencySymbol,
+        onHandleSearchRefresh: handleSearchRefresh,
+      ),
     );
   }
 
-  void _addExpense(Expense newexp){
+  void _addExpense(Expense newexp) {
     setState(() {
       _registeredExpenses.add(newexp);
       _filteredExpenses?.add(newexp);
     });
   }
 
-  void _removeExpense(Expense exp,{ void Function()? handleSearchRefresh}){
-    final expenseIndex= _registeredExpenses.indexOf(exp);
+  void _removeExpense(Expense exp, {void Function()? handleSearchRefresh}) {
+    final expenseIndex = _registeredExpenses.indexOf(exp);
     setState(() {
       _registeredExpenses.remove(exp);
       _filteredExpenses?.remove(exp);
@@ -108,118 +112,119 @@ class _ExpensesState extends State<Expenses> {
         action: SnackBarAction(
           label: "Undo",
           onPressed: () {
-          // Undo the expense removal
-          setState(() {
-            _registeredExpenses.insert(expenseIndex, exp);
-            _filteredExpenses?.insert(expenseIndex, exp);
-          });
-          // Call the refresh callback after undo
-          if (handleSearchRefresh != null) {
-            handleSearchRefresh();
-          }
-        },
+            // Undo the expense removal
+            setState(() {
+              _registeredExpenses.insert(expenseIndex, exp);
+              _filteredExpenses?.insert(expenseIndex, exp);
+            });
+            // Call the refresh callback after undo
+            if (handleSearchRefresh != null) {
+              handleSearchRefresh();
+            }
+          },
         ),
       ),
     );
     //call refresh after the delete if we are in the searchpage
-    if(handleSearchRefresh!=null){
+    if (handleSearchRefresh != null) {
       handleSearchRefresh();
     }
   }
 
-  
-  void _modifyExpense(Expense edited){
-   final editedExpenseIndex=_registeredExpenses.indexOf(edited);
-   if(editedExpenseIndex>-1){
-     setState(() {
-      _registeredExpenses[editedExpenseIndex]=edited;
-       _filteredExpenses?[editedExpenseIndex]=edited;
-     });
-    GlobalSnackBar.clearSnackBars(context);
-    GlobalSnackBar.show(
-      context,
-      const GlobalSnackBar(
-        behavior: SnackBarBehavior.floating,
-        duration: Duration(seconds: 3),
-        contentText: "Expense Updated",
-      ),
-    );
-   }
+  void _modifyExpense(Expense edited) {
+    final editedExpenseIndex = _registeredExpenses.indexOf(edited);
+    if (editedExpenseIndex > -1) {
+      setState(() {
+        _registeredExpenses[editedExpenseIndex] = edited;
+        _filteredExpenses?[editedExpenseIndex] = edited;
+      });
+      GlobalSnackBar.clearSnackBars(context);
+      GlobalSnackBar.show(
+        context,
+        const GlobalSnackBar(
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 3),
+          contentText: "Expense Updated",
+        ),
+      );
+    }
   }
 
-
-   List<Expense> _filterExpenses(String? searchtext){
-      if(searchtext==null || searchtext.isEmpty) return List.empty();
-     return _registeredExpenses
+  List<Expense> _filterExpenses(String? searchtext) {
+    if (searchtext == null || searchtext.isEmpty) return List.empty();
+    return _registeredExpenses
         .where(
           (element) => element.title.toLowerCase().contains(
                 searchtext.toLowerCase(),
               ),
         )
         .toList();
-   }
+  }
 
-   List<Expense> _filterandSort(Filter? filterObj){
-      if(filterObj?.category==null && filterObj?.sorting==null) return _registeredExpenses;
-      bool matches=true;
-      var result= _filteredExpenses?.where((element){
-         if(filterObj?.category!=null){
-          matches=matches && filterObj?.category==element.category;
-         }
-         return matches;
+  List<Expense> _filterandSort(Filter? filterObj) {
+    if (filterObj?.categories == null && filterObj?.sorting == null) {
+      //non filtri nulla e non ordini nulla esco da filteredview
+      setState(() {
+        isFilteredView=false;
+      });
+      return _registeredExpenses;
+    }
+    List<Expense>? result=List.from(_filteredExpenses!);
+    //handle category filtering single and multiple
+    lastfilterObj=filterObj;
+    if(filterObj?.categories!=null){
+      result=_filteredExpenses?.where((element) {
+       //TODO FIX BUG VEDI POST IT scrivania
+        return filterObj!.categories!.any((cat) => cat.name==element.category.name);
       }).toList();
-      if(result!.isEmpty){
-        setState(() {
-          _filteredExpenses=result;
-          isFilteredView=true;
-        });
-        return List.empty();
-      } 
-      if(filterObj?.sorting!=null && filterObj?.sortDirection!=null){
-        result.sort((a,b){
-          int comparison;
-        switch (filterObj?.sorting){
+    }
+    //check sorting
+    if (filterObj?.sorting != null) {
+      //handle sort
+      result?.sort((a, b) {
+        int comparison;
+        switch (filterObj?.sorting) {
           case Sorting.date:
-            comparison=a.date.compareTo(b.date);
+            comparison = a.date.compareTo(b.date);
             break;
           case Sorting.price:
-            comparison=a.amount.compareTo(b.amount);
+            comparison = a.amount.compareTo(b.amount);
             break;
           case Sorting.expensename:
-            comparison=a.title.compareTo(b.title);
+            comparison = a.title.compareTo(b.title);
             break;
           default:
-            comparison=0;
-          
+            comparison = 0;
         }
-        return filterObj?.sortDirection==SortDirection.up ? comparison : -comparison;
-        });
-        
-      }
-      setState(() {
-        _filteredExpenses=result;
-        isFilteredView=true;
+        return filterObj?.sortDirection == SortDirection.up
+            ? comparison
+            : -comparison;
       });
-      return result;
-   }
+    }
 
-    void _openFilterExpenseOverlay(){
+    setState(() {
+      _filteredExpenses=result;
+      isFilteredView=true;
+      appliedFilterNum=filterObj?.categories?.length;
+    });
+    return result ?? List.empty();
+  }
 
+  void _openFilterExpenseOverlay() {
     //context è resa disponibile da flutter in automatico dato che siamo in una classe che estende state
     //eg statefulwidget
     //context--> metadati ogni widget ha il suo. contiene info sul widget e su sua posizione in widget tree
     //builder è una funzione che ritorna un widget
     //funzione handlesearchrefresh ha valore non null nel caso di modifica da pagine della ricerca ed eseguita per aver i dati aggiornati
-   showModalBottomSheet(
-      isScrollControlled: true,
-      isDismissible: true,
-      context: context,
-      builder: (ctx) => FiltersWidget(onFilterandSort: _filterandSort,)
-    );
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        context: context,
+        builder: (ctx) => FiltersWidget(
+              onFilterandSort: _filterandSort,
+              lastAppliedfilterObj: lastfilterObj,
+            ));
   }
-
-    
-
 
   @override
   Widget build(BuildContext context) {
@@ -277,7 +282,8 @@ class _ExpensesState extends State<Expenses> {
           GestureDetector(
             onTap: _openFilterExpenseOverlay,
             child: Badge(
-              label: Text("1"),
+              isLabelVisible: (appliedFilterNum ?? 0)>0,
+              label:  Text("$appliedFilterNum"),
               offset: const Offset(-5, 10),
               alignment: Alignment.topRight,
               child: IconButton(
@@ -292,33 +298,53 @@ class _ExpensesState extends State<Expenses> {
         children: [
           //spacer prende quanto spazio possibile e lo divide equamente tra i due widget qua presenti
           //conditonal list per evitare di fare un expanded che wrappa colonna ecc
-          if(_registeredExpenses.isEmpty)...[
+          if (_registeredExpenses.isEmpty) ...[
             const Spacer(),
             const Center(
               child: Text("No expenses found. Start adding some!"),
             ),
-             CircleAvatar(child: IconButton(onPressed: _openAddExpenseOverlay, icon: const Icon(Icons.add)),),
+            CircleAvatar(
+              child: IconButton(
+                  onPressed: _openAddExpenseOverlay,
+                  icon: const Icon(Icons.add)),
+            ),
             const Spacer()
-          ]else if(isFilteredView && _filteredExpenses!.isEmpty)...[
-               Center(child: Text("No result found for this filters"),)
-          ]else ...[
-            const SizedBox(height: 12,),
-            if(!isFilteredView)...[
-               Text("Chart",style: Theme.of(context).textTheme.titleSmall),
-             Chart(expenses: _registeredExpenses),
+          ] else if (isFilteredView && _filteredExpenses!.isEmpty) ...[
+            const Center(
+              child: Text("No result found for this filters"),
+            )
+          ] else ...[
+            const SizedBox(
+              height: 12,
+            ),
+            //mostra grafico solo se non sono con filtri oppure se categorie in filtri sono più di una e se risultati sono da 2 in su
+            // uso numero usato nel badge dei filtri applicati per il check
+            if (!isFilteredView ||
+                (isFilteredView &&
+                    (appliedFilterNum ?? 0) > 1 &&
+                    (_filteredExpenses?.length ?? 0) >= 2)) ...[
+              Text("Chart", style: Theme.of(context).textTheme.titleSmall),
+              Chart(expenses: _registeredExpenses),
             ],
-             Text("My Expenses",style: Theme.of(context).textTheme.titleSmall,),
-             ExpensesList(
-              expenses: isFilteredView ?   _filteredExpenses! : _registeredExpenses,
+            Text(
+              "My Expenses",
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            ExpensesList(
+              expenses:
+                  isFilteredView ? _filteredExpenses! : _registeredExpenses,
               onRemoveExpense: _removeExpense,
               onModifyswipeDirection: _openAddExpenseOverlay,
               currencySymbol: currencySymbol!,
             ),
           ]
-          
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(onPressed: _openAddExpenseOverlay, label: const Text("New Expense"),icon: const Icon(Icons.add),),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _openAddExpenseOverlay,
+        label: const Text("New Expense"),
+        icon: const Icon(Icons.add),
+      ),
     );
   }
 }
