@@ -6,7 +6,7 @@ import 'package:expensetracker/models/sorting.dart';
 import 'package:flutter/material.dart';
 
 class FiltersWidget extends StatefulWidget {
-  final List<Expense> Function (Filter? filterObj) onFilterandSort;
+  final List<Expense> Function ({Filter? filterObj}) onFilterandSort;
   Filter? lastAppliedfilterObj;
   FiltersWidget({super.key,required this.onFilterandSort,this.lastAppliedfilterObj});
 
@@ -44,7 +44,7 @@ class FiltersWidgetstate extends State<FiltersWidget> {
                 onPressed: () {
                   Navigator.pop(context);
                   widget.onFilterandSort(
-                    Filter(
+                  filterObj:  Filter(
                       categories: _selectedCategories.isEmpty ? (widget.lastAppliedfilterObj?.categories) : _selectedCategories,
                       sorting: _selectedSorting ?? widget.lastAppliedfilterObj?.sorting,
                       sortDirection: _selectedSorting != null
@@ -130,9 +130,7 @@ class FiltersWidgetstate extends State<FiltersWidget> {
                       });
                     },
                     showCheckmark: false,
-                    avatar: CircleAvatar(
-                      child: Icon(entry.value),
-                    ),
+                    avatar:entry.value!=null ?  CircleAvatar(child: Icon(entry.value),) : null,
                     padding: const EdgeInsets.all(4),
                     labelPadding:
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -163,7 +161,8 @@ class FiltersWidgetstate extends State<FiltersWidget> {
                           : SortDirection.up.name;
                     });
                   },
-                  // icon:  widget.lastAppliedfilterObj?.sortDirection !=null ?  Icon(widget.lastAppliedfilterObj?.sortDirection ==SortDirection.up ? Icons.arrow_upward : Icons.arrow_downward) : 
+                  //icon:  widget.lastAppliedfilterObj?.sortDirection !=null ?  Icon(widget.lastAppliedfilterObj?.sortDirection ==SortDirection.up ? Icons.arrow_upward : Icons.arrow_downward) : Icon(defaultSortdir ==SortDirection.up.name ? Icons.arrow_upward : Icons.arrow_downward)
+                  //TODO FIX DISPLAYED ARROW SHOWING WRONG
                   icon: defaultSortdir == SortDirection.up.name
                       ? const Icon(Icons.arrow_upward)
                       : const Icon(Icons.arrow_downward),
@@ -187,6 +186,10 @@ class FiltersWidgetstate extends State<FiltersWidget> {
                     showCheckmark: false,
                     selected: _selectedSorting == entry.key || widget.lastAppliedfilterObj?.sorting==entry.key,
                     onSelected: (_) {
+                      //prevent accidental multiple selection if we have a previous sort value
+                      if(widget.lastAppliedfilterObj?.sorting!=null){
+                        widget.lastAppliedfilterObj?.sorting=null;
+                      }
                       setState(() {
                         _selectedSorting = entry.key;
                       });
