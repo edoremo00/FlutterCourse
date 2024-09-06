@@ -1,13 +1,14 @@
 import 'package:expensetracker/expenses.dart';
 import 'package:expensetracker/models/category.dart';
+import 'package:expensetracker/models/expense.dart';
 import 'package:expensetracker/models/sorting.dart';
 
 class Filter{
    List<Category>? categories;
    Sorting? sorting;
    SortDirection? sortDirection;
-
-   Filter({this.categories,this.sorting,this.sortDirection});
+   ExpenseType? expenseType;
+   Filter({this.categories,this.sorting,this.sortDirection,this.expenseType});
 
 //   @override
 //   bool operator ==(Object other) {
