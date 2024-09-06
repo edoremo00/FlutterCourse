@@ -1,4 +1,5 @@
 import 'package:expensetracker/models/category.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:uuid/uuid.dart';
@@ -7,12 +8,20 @@ const uuid = Uuid();
 
 final formatter = DateFormat("dd/MM/y", "it_IT");
 
+
+enum ExpenseType {expense,income,transfer}
+var expenseTypes={
+  ExpenseType.expense:Colors.red,
+  ExpenseType.income:Colors.green,
+  ExpenseType.transfer:Colors.blue
+};
 class Expense {
   final String id;
   String title;
   double amount;
   DateTime date;
   Category category;
+  ExpenseType expenseType;
 
 //https://dart.dev/language/constructors#use-an-initializer-list questa feature di dart mi permette di
 //inizializzare l'id prima che il costruttore venga eseguito
@@ -20,7 +29,7 @@ class Expense {
       {required this.title,
       required this.amount,
       required DateTime expdate,
-      required this.category})
+      required this.category,required this.expenseType})
       : id = uuid.v4(),
         date = expdate;
 

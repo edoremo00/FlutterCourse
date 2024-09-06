@@ -1,6 +1,7 @@
 import 'package:expensetracker/models/filter.dart';
 import 'package:expensetracker/models/sorting.dart';
 import 'package:expensetracker/widgets/chart/chart.dart';
+import 'package:expensetracker/widgets/expenses-list/expense_type_filter.dart';
 import 'package:expensetracker/widgets/expenses-list/expenses_list.dart';
 import 'package:expensetracker/models/expense.dart';
 import 'package:expensetracker/widgets/filters.dart';
@@ -25,12 +26,14 @@ class Expenses extends StatefulWidget {
 class _ExpensesState extends State<Expenses> {
   final List<Expense> _registeredExpenses = [
     Expense(
+      expenseType: ExpenseType.expense,
       title: "Flutter Course",
       amount: 9.99,
       expdate: DateTime.now(),
       category: Category.work,
     ),
     Expense(
+      expenseType: ExpenseType.expense,
       title: "Cinema",
       amount: 16.99,
       expdate: DateTime.now(),
@@ -42,9 +45,8 @@ class _ExpensesState extends State<Expenses> {
   List<Expense>? _filteredExpenses;
   bool isFilteredView = false;
   int? appliedFilterNum;
+  ExpenseType? appliedExpensetypeFilter;
   Filter? lastfilterObj;
-
-  
 
   @override
   void initState() {
@@ -91,8 +93,13 @@ class _ExpensesState extends State<Expenses> {
 
   void _addExpense(Expense newexp) {
     setState(() {
-      _registeredExpenses.add(newexp);
-      _filteredExpenses?.add(newexp);
+      if (isFilteredView && appliedFilterNum! > 0) {
+        _registeredExpenses.add(newexp);
+        _filteredExpenses?.add(newexp);
+      } else {
+        isFilteredView = false;
+        _registeredExpenses.add(newexp);
+      }
     });
   }
 
@@ -133,10 +140,16 @@ class _ExpensesState extends State<Expenses> {
 
   void _modifyExpense(Expense edited) {
     final editedExpenseIndex = _registeredExpenses.indexOf(edited);
+    bool shouldRefreshfilters = false;
     if (editedExpenseIndex > -1) {
+      if (_registeredExpenses[editedExpenseIndex].category.name !=
+          edited.category.name) {
+        //user changed the category
+        shouldRefreshfilters = true;
+      }
       setState(() {
         _registeredExpenses[editedExpenseIndex] = edited;
-        _filteredExpenses?[editedExpenseIndex] = edited;
+        // _filteredExpenses?[editedExpenseIndex] = edited;
       });
       GlobalSnackBar.clearSnackBars(context);
       GlobalSnackBar.show(
@@ -147,9 +160,32 @@ class _ExpensesState extends State<Expenses> {
           contentText: "Expense Updated",
         ),
       );
+      //redo the filtering after update in case user changed info in particular the category
+      if (shouldRefreshfilters) {
+        _refreshFilters();
+      }
     }
   }
 
+  void _refreshFilters() {
+    var filter = Filter();
+    if (lastfilterObj?.categories != null) {
+      if (lastfilterObj!.categories!.isNotEmpty) {
+        filter.categories = lastfilterObj!.categories;
+      } else {
+        filter.categories = List.empty();
+      }
+    }
+    if (lastfilterObj?.sorting != null) {
+      filter.sorting = lastfilterObj!.sorting;
+    }
+    if (lastfilterObj?.sortDirection != null) {
+      filter.sortDirection = lastfilterObj!.sortDirection;
+    }
+    _filterandSort(filterObj: filter);
+  }
+
+//METODO NON PIù USATO. tutto inglobato in filterandsort
   List<Expense> _filterExpenses(String? searchtext) {
     if (searchtext == null || searchtext.isEmpty) return List.empty();
     return _registeredExpenses
@@ -161,27 +197,50 @@ class _ExpensesState extends State<Expenses> {
         .toList();
   }
 
-  List<Expense> _filterandSort(Filter? filterObj) {
-    if (filterObj?.categories == null && filterObj?.sorting == null) {
+  List<Expense> _filterandSort({Filter? filterObj,String? searchText}) {
+    if (filterObj?.categories == null && filterObj?.sorting == null && (searchText==null|| searchText.isEmpty) && (filterObj?.expenseType==null)) {
       //non filtri nulla e non ordini nulla esco da filteredview
       setState(() {
-        isFilteredView=false;
+        isFilteredView = false;
       });
       return _registeredExpenses;
     }
-    List<Expense>? result=List.from(_filteredExpenses!);
+    List<Expense> result = List.from(_registeredExpenses);
     //handle category filtering single and multiple
-    lastfilterObj=filterObj;
-    if(filterObj?.categories!=null){
-      result=_filteredExpenses?.where((element) {
-       //TODO FIX BUG VEDI POST IT scrivania
-        return filterObj!.categories!.any((cat) => cat.name==element.category.name);
-      }).toList();
+    lastfilterObj = filterObj;
+    if (filterObj?.categories != null) {
+      result = filterObj!.categories!.isNotEmpty
+          ? (result.where((element) {
+              return filterObj!.categories!
+                  .any((cat) => cat.name == element.category.name);
+            }).toList())
+          : _registeredExpenses;
+      // result=_registeredExpenses.where((element) {
+      //   return filterObj!.categories!.any((cat) => cat.name==element.category.name);
+      // }).toList();
     }
+    //handle search by text
+    if (searchText != null && searchText.isNotEmpty) {
+      result = result
+          .where(
+            (element) => element.title.toLowerCase().contains(
+                  searchText.toLowerCase(),
+                ),
+          )
+          .toList();
+    }
+
+    //handle search by expensetype
+    if(filterObj?.expenseType!=null){
+      result = result
+          .where((element) => element.expenseType == filterObj?.expenseType)
+          .toList();
+    }
+    
     //check sorting
     if (filterObj?.sorting != null) {
       //handle sort
-      result?.sort((a, b) {
+      result.sort((a, b) {
         int comparison;
         switch (filterObj?.sorting) {
           case Sorting.date:
@@ -203,11 +262,11 @@ class _ExpensesState extends State<Expenses> {
     }
 
     setState(() {
-      _filteredExpenses=result;
-      isFilteredView=true;
-      appliedFilterNum=filterObj?.categories?.length;
+      _filteredExpenses = result;
+      isFilteredView = true;
+      appliedFilterNum = filterObj?.categories?.length;
     });
-    return result ?? List.empty();
+    return result;
   }
 
   void _openFilterExpenseOverlay() {
@@ -269,7 +328,7 @@ class _ExpensesState extends State<Expenses> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (BuildContext context) => SearchPage(
-                    onExpenseSearch: _filterExpenses,
+                    onExpenseSearch: _filterandSort,
                     currencySymbol: currencySymbol!,
                     onModifyswipeDirection: _openAddExpenseOverlay,
                     onRemoveExpense: _removeExpense,
@@ -282,8 +341,12 @@ class _ExpensesState extends State<Expenses> {
           GestureDetector(
             onTap: _openFilterExpenseOverlay,
             child: Badge(
-              isLabelVisible: (appliedFilterNum ?? 0)>0,
-              label:  Text("$appliedFilterNum"),
+              backgroundColor: Theme.of(context).badgeTheme.backgroundColor,
+              textColor: Theme.of(context).badgeTheme.textColor,
+              isLabelVisible: (appliedFilterNum ?? 0) > 0,
+              label: Text(
+                "$appliedFilterNum",
+              ),
               offset: const Offset(-5, 10),
               alignment: Alignment.topRight,
               child: IconButton(
@@ -310,9 +373,61 @@ class _ExpensesState extends State<Expenses> {
             ),
             const Spacer()
           ] else if (isFilteredView && _filteredExpenses!.isEmpty) ...[
+            const SizedBox(
+              height: 12,
+            ),
+            Text("Chart", style: Theme.of(context).textTheme.titleSmall),
+            Chart(expenses: _registeredExpenses),
+            Text(
+              "My Expenses",
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ...expenseTypes.entries.map(
+                  (e) => ExpenseTypeFilter(
+                    label: Text(
+                      e.key.name,
+                      style: TextStyle(
+                          color: appliedExpensetypeFilter == e.key
+                              ? e.value
+                              : Theme.of(context).textTheme.bodySmall?.color),
+                    ),
+                    borderColor: appliedExpensetypeFilter == e.key
+                        ? e.value
+                        : Theme.of(context).cardTheme.color!,
+                    selected: appliedExpensetypeFilter == e.key,
+                    onSelected: (_) {
+                      setState(() {
+                        //gestione deselect filtro
+                        if (appliedExpensetypeFilter != null &&
+                            e.key == appliedExpensetypeFilter) {
+                          appliedExpensetypeFilter = null;
+                        } else {
+                          appliedExpensetypeFilter = e.key;
+                        }
+                        //do the filtering
+                        _filterandSort(
+                          filterObj: Filter(
+                              categories: lastfilterObj?.categories,
+                              expenseType: appliedExpensetypeFilter,
+                              sortDirection: lastfilterObj?.sortDirection,
+                              sorting: lastfilterObj?.sorting),
+                        );
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
             const Center(
               child: Text("No result found for this filters"),
-            )
+            ),
+            
           ] else ...[
             const SizedBox(
               height: 12,
@@ -320,15 +435,54 @@ class _ExpensesState extends State<Expenses> {
             //mostra grafico solo se non sono con filtri oppure se categorie in filtri sono più di una e se risultati sono da 2 in su
             // uso numero usato nel badge dei filtri applicati per il check
             if (!isFilteredView ||
-                (isFilteredView &&
-                    (appliedFilterNum ?? 0) > 1 &&
-                    (_filteredExpenses?.length ?? 0) >= 2)) ...[
+                (isFilteredView && (_filteredExpenses?.length ?? 0) >= 2)) ...[
               Text("Chart", style: Theme.of(context).textTheme.titleSmall),
               Chart(expenses: _registeredExpenses),
             ],
             Text(
               "My Expenses",
               style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: 20,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ...expenseTypes.entries.map(
+                  (e) => ExpenseTypeFilter(
+                    label: Text(
+                      e.key.name,
+                      style: TextStyle(
+                          color: appliedExpensetypeFilter == e.key
+                              ? e.value
+                              : Theme.of(context).textTheme.bodySmall?.color),
+                    ),
+                    borderColor: appliedExpensetypeFilter == e.key
+                        ? e.value
+                        : Theme.of(context).cardTheme.color!,
+                    selected: appliedExpensetypeFilter == e.key,
+                    onSelected: (_) {
+                      setState(() {
+                        //gestione deselect filtro
+                        if (appliedExpensetypeFilter != null &&
+                            e.key == appliedExpensetypeFilter) {
+                          appliedExpensetypeFilter = null;
+                        } else {
+                          appliedExpensetypeFilter = e.key;
+                        }
+                        //do the filtering
+                        _filterandSort(
+                          filterObj: Filter(
+                            categories: lastfilterObj?.categories,
+                            expenseType: appliedExpensetypeFilter,
+                            sortDirection: lastfilterObj?.sortDirection,
+                            sorting: lastfilterObj?.sorting
+                          ),
+                        );
+                      });
+                    },
+                  ),
+                ),
+              ],
             ),
             ExpensesList(
               expenses:
