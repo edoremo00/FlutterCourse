@@ -47,7 +47,7 @@ void main() {
       //circleavatar theming for dark mode
       primaryColorLight: kDarkColorScheme.inversePrimary,
       chipTheme: const ChipThemeData().copyWith(
-        selectedColor: kDarkColorScheme.primaryContainer
+        selectedColor: kDarkColorScheme.primaryContainer,
       ),
       textTheme:ThemeData(brightness: Brightness.dark).textTheme.copyWith(
         titleLarge: GoogleFonts.ubuntu(
@@ -67,6 +67,9 @@ void main() {
           )
           
         ),
+        badgeTheme: BadgeThemeData().copyWith(
+          backgroundColor: Colors.red
+        )
 
       
       ),
@@ -115,11 +118,19 @@ void main() {
           ),
           bodySmall: GoogleFonts.ubuntu(
             fontWeight: FontWeight.w600,
-            color: kDarkColorScheme.onSecondaryContainer,
+            color: kColorScheme.onSecondaryContainer,
             fontSize: 14, 
           ),
         ),
+        chipTheme: const ChipThemeData().copyWith(
+        selectedColor: kColorScheme.primaryContainer
+      ),     
+      badgeTheme: BadgeThemeData().copyWith(
+          backgroundColor: kColorScheme.secondaryContainer,
+          textColor: Colors.black
+        ),
       ),
+      
       home: const Expenses(),
       debugShowCheckedModeBanner: false,
       //theme mode usato per dire ad app quale tema applicare dark o light
