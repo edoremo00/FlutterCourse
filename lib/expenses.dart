@@ -140,13 +140,13 @@ class _ExpensesState extends State<Expenses> {
 
   void _modifyExpense(Expense edited) {
     final editedExpenseIndex = _registeredExpenses.indexOf(edited);
-    bool shouldRefreshfilters = false;
+    // bool shouldRefreshfilters = false;
     if (editedExpenseIndex > -1) {
-      if (_registeredExpenses[editedExpenseIndex].category.name !=
-          edited.category.name) {
-        //user changed the category
-        shouldRefreshfilters = true;
-      }
+      // if (_registeredExpenses[editedExpenseIndex].category.name !=
+      //     edited.category.name || _registeredExpenses[editedExpenseIndex].expenseType.index !=edited.expenseType.index) {
+      //   //user changed the category or the type of the expense eg: expense--> income
+      //   shouldRefreshfilters = true;
+      // }
       setState(() {
         _registeredExpenses[editedExpenseIndex] = edited;
         // _filteredExpenses?[editedExpenseIndex] = edited;
@@ -160,13 +160,14 @@ class _ExpensesState extends State<Expenses> {
           contentText: "Expense Updated",
         ),
       );
-      //redo the filtering after update in case user changed info in particular the category
-      if (shouldRefreshfilters) {
-        _refreshFilters();
-      }
+      // //redo the filtering after update in case user changed info in particular the category
+      // if (shouldRefreshfilters) {
+      //   _refreshFilters();
+      // }
     }
   }
 
+//metodo non più necessario aggiornamento filtri già gestito prima
   void _refreshFilters() {
     var filter = Filter();
     if (lastfilterObj?.categories != null) {
@@ -432,10 +433,10 @@ class _ExpensesState extends State<Expenses> {
             const SizedBox(
               height: 12,
             ),
-            //mostra grafico solo se non sono con filtri oppure se categorie in filtri sono più di una e se risultati sono da 2 in su
+            //mostra grafico solo se non sono con filtri oppure se categorie in filtri sono più di una 
             // uso numero usato nel badge dei filtri applicati per il check
             if (!isFilteredView ||
-                (isFilteredView && (_filteredExpenses?.length ?? 0) >= 2)) ...[
+                (isFilteredView && (_filteredExpenses?.length ?? 0) >= 1)) ...[
               Text("Chart", style: Theme.of(context).textTheme.titleSmall),
               Chart(expenses: _registeredExpenses),
             ],
