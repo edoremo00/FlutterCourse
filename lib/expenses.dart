@@ -124,7 +124,7 @@ class _ExpensesState extends State<Expenses> {
               _registeredExpenses.insert(expenseIndex, exp);
               _filteredExpenses?.insert(expenseIndex, exp);
             });
-            // Call the refresh callback after undo
+            // Call the refresh callback after undo made from searchpage
             if (handleSearchRefresh != null) {
               handleSearchRefresh();
             }
@@ -491,6 +491,7 @@ class _ExpensesState extends State<Expenses> {
               onRemoveExpense: _removeExpense,
               onModifyswipeDirection: _openAddExpenseOverlay,
               currencySymbol: currencySymbol!,
+
             ),
           ]
         ],

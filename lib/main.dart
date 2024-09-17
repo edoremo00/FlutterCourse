@@ -69,9 +69,7 @@ void main() {
         ),
         badgeTheme: BadgeThemeData().copyWith(
           backgroundColor: Colors.red
-        )
-
-      
+        ),      
       ),
 
       //LIGHT MODE

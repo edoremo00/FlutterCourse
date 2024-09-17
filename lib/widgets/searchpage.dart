@@ -68,9 +68,10 @@ class Searchpagestate extends State<SearchPage>{
                         hintText: "Search expenses",
                         hintStyle: TextStyle(
                           color: Colors.white.withOpacity(0.5)
-                        )
+                        ),
+                        
                       ),
-                      
+                      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.white.withOpacity(0.5),),
                     ),
                   ),
                   
