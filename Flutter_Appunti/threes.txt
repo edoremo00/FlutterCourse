@@ -1,0 +1,14 @@
+quando lavoriamo con flutter lavoriamo con i threes ossia alberi. ne esistono 3
+
+1) widget three--> combinazione widget
+2) element three--> rappresentazione in memory dei widget da non confondere con oggetti widget. sono oggetti aggiuntivi connessi a oggetti widget.
+flutter li usa per capire quando UI deve essere aggiornata. flutter non ricrea per forza questi oggetti quando faccio setstate ma solo quelli che è strettamente necessario
+3) render three--> i blocchi di UI visibili
+
+
+vedi progetto flutterinternals per vedere in partica questi concetti
+
+METODO CREATELEEMENT FLUTTER
+flutter chiama questo metodo per creare elementi (oggetti che saranno connessi al widget) per widget. a meno che widget non venga rimosso da three flutter non richiamerà questo metodo ancora
+
+gli elementi che crea flutter in questo metodo vengono usati per determinare quando render three deve essere aggiornato e quali update servono a UI
